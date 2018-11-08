@@ -14,6 +14,8 @@
 		352C2E0C218DBC12004B694F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 352C2E0A218DBC12004B694F /* LaunchScreen.storyboard */; };
 		352C2E17218DBC12004B694F /* GrowthfileNewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 352C2E16218DBC12004B694F /* GrowthfileNewTests.swift */; };
 		352C2E22218DBC12004B694F /* GrowthfileNewUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 352C2E21218DBC12004B694F /* GrowthfileNewUITests.swift */; };
+		352C2E30218E94F5004B694F /* Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 352C2E2F218E94F5004B694F /* Helper.swift */; };
+		352C2E32218E9F16004B694F /* KeyChainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 352C2E31218E9F16004B694F /* KeyChainService.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -34,19 +36,21 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		352C2DFE218DBC10004B694F /* GrowthfileNew.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GrowthfileNew.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		352C2DFE218DBC10004B694F /* GrowthfileNewApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GrowthfileNewApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		352C2E01218DBC10004B694F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		352C2E03218DBC10004B694F /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		352C2E06218DBC10004B694F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		352C2E08218DBC12004B694F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		352C2E0B218DBC12004B694F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		352C2E0D218DBC12004B694F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		352C2E12218DBC12004B694F /* GrowthfileNewTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GrowthfileNewTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		352C2E12218DBC12004B694F /* GrowthfileNewAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GrowthfileNewAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		352C2E16218DBC12004B694F /* GrowthfileNewTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrowthfileNewTests.swift; sourceTree = "<group>"; };
 		352C2E18218DBC12004B694F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		352C2E1D218DBC12004B694F /* GrowthfileNewUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GrowthfileNewUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		352C2E1D218DBC12004B694F /* GrowthfileNewAppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GrowthfileNewAppUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		352C2E21218DBC12004B694F /* GrowthfileNewUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrowthfileNewUITests.swift; sourceTree = "<group>"; };
 		352C2E23218DBC12004B694F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		352C2E2F218E94F5004B694F /* Helper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helper.swift; sourceTree = "<group>"; };
+		352C2E31218E9F16004B694F /* KeyChainService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyChainService.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -87,9 +91,9 @@
 		352C2DFF218DBC10004B694F /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				352C2DFE218DBC10004B694F /* GrowthfileNew.app */,
-				352C2E12218DBC12004B694F /* GrowthfileNewTests.xctest */,
-				352C2E1D218DBC12004B694F /* GrowthfileNewUITests.xctest */,
+				352C2DFE218DBC10004B694F /* GrowthfileNewApp.app */,
+				352C2E12218DBC12004B694F /* GrowthfileNewAppTests.xctest */,
+				352C2E1D218DBC12004B694F /* GrowthfileNewAppUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -103,6 +107,8 @@
 				352C2E08218DBC12004B694F /* Assets.xcassets */,
 				352C2E0A218DBC12004B694F /* LaunchScreen.storyboard */,
 				352C2E0D218DBC12004B694F /* Info.plist */,
+				352C2E2F218E94F5004B694F /* Helper.swift */,
+				352C2E31218E9F16004B694F /* KeyChainService.swift */,
 			);
 			path = GrowthfileNew;
 			sourceTree = "<group>";
@@ -128,9 +134,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		352C2DFD218DBC10004B694F /* GrowthfileNew */ = {
+		352C2DFD218DBC10004B694F /* GrowthfileNewApp */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 352C2E26218DBC12004B694F /* Build configuration list for PBXNativeTarget "GrowthfileNew" */;
+			buildConfigurationList = 352C2E26218DBC12004B694F /* Build configuration list for PBXNativeTarget "GrowthfileNewApp" */;
 			buildPhases = (
 				352C2DFA218DBC10004B694F /* Sources */,
 				352C2DFB218DBC10004B694F /* Frameworks */,
@@ -140,14 +146,14 @@
 			);
 			dependencies = (
 			);
-			name = GrowthfileNew;
+			name = GrowthfileNewApp;
 			productName = GrowthfileNew;
-			productReference = 352C2DFE218DBC10004B694F /* GrowthfileNew.app */;
+			productReference = 352C2DFE218DBC10004B694F /* GrowthfileNewApp.app */;
 			productType = "com.apple.product-type.application";
 		};
-		352C2E11218DBC12004B694F /* GrowthfileNewTests */ = {
+		352C2E11218DBC12004B694F /* GrowthfileNewAppTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 352C2E29218DBC12004B694F /* Build configuration list for PBXNativeTarget "GrowthfileNewTests" */;
+			buildConfigurationList = 352C2E29218DBC12004B694F /* Build configuration list for PBXNativeTarget "GrowthfileNewAppTests" */;
 			buildPhases = (
 				352C2E0E218DBC12004B694F /* Sources */,
 				352C2E0F218DBC12004B694F /* Frameworks */,
@@ -158,14 +164,14 @@
 			dependencies = (
 				352C2E14218DBC12004B694F /* PBXTargetDependency */,
 			);
-			name = GrowthfileNewTests;
+			name = GrowthfileNewAppTests;
 			productName = GrowthfileNewTests;
-			productReference = 352C2E12218DBC12004B694F /* GrowthfileNewTests.xctest */;
+			productReference = 352C2E12218DBC12004B694F /* GrowthfileNewAppTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		352C2E1C218DBC12004B694F /* GrowthfileNewUITests */ = {
+		352C2E1C218DBC12004B694F /* GrowthfileNewAppUITests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 352C2E2C218DBC12004B694F /* Build configuration list for PBXNativeTarget "GrowthfileNewUITests" */;
+			buildConfigurationList = 352C2E2C218DBC12004B694F /* Build configuration list for PBXNativeTarget "GrowthfileNewAppUITests" */;
 			buildPhases = (
 				352C2E19218DBC12004B694F /* Sources */,
 				352C2E1A218DBC12004B694F /* Frameworks */,
@@ -176,9 +182,9 @@
 			dependencies = (
 				352C2E1F218DBC12004B694F /* PBXTargetDependency */,
 			);
-			name = GrowthfileNewUITests;
+			name = GrowthfileNewAppUITests;
 			productName = GrowthfileNewUITests;
-			productReference = 352C2E1D218DBC12004B694F /* GrowthfileNewUITests.xctest */;
+			productReference = 352C2E1D218DBC12004B694F /* GrowthfileNewAppUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
@@ -204,7 +210,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 352C2DF9218DBC10004B694F /* Build configuration list for PBXProject "GrowthfileNew" */;
+			buildConfigurationList = 352C2DF9218DBC10004B694F /* Build configuration list for PBXProject "GrowthfileNewApp" */;
 			compatibilityVersion = "Xcode 9.3";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -217,9 +223,9 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				352C2DFD218DBC10004B694F /* GrowthfileNew */,
-				352C2E11218DBC12004B694F /* GrowthfileNewTests */,
-				352C2E1C218DBC12004B694F /* GrowthfileNewUITests */,
+				352C2DFD218DBC10004B694F /* GrowthfileNewApp */,
+				352C2E11218DBC12004B694F /* GrowthfileNewAppTests */,
+				352C2E1C218DBC12004B694F /* GrowthfileNewAppUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -257,7 +263,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				352C2E04218DBC10004B694F /* ViewController.swift in Sources */,
+				352C2E32218E9F16004B694F /* KeyChainService.swift in Sources */,
 				352C2E02218DBC10004B694F /* AppDelegate.swift in Sources */,
+				352C2E30218E94F5004B694F /* Helper.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -282,12 +290,12 @@
 /* Begin PBXTargetDependency section */
 		352C2E14218DBC12004B694F /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 352C2DFD218DBC10004B694F /* GrowthfileNew */;
+			target = 352C2DFD218DBC10004B694F /* GrowthfileNewApp */;
 			targetProxy = 352C2E13218DBC12004B694F /* PBXContainerItemProxy */;
 		};
 		352C2E1F218DBC12004B694F /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 352C2DFD218DBC10004B694F /* GrowthfileNew */;
+			target = 352C2DFD218DBC10004B694F /* GrowthfileNewApp */;
 			targetProxy = 352C2E1E218DBC12004B694F /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -432,6 +440,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = SAAX8C4X6E;
 				INFOPLIST_FILE = GrowthfileNew/Info.plist;
@@ -439,10 +448,11 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.growthfile.GrowthfileNew;
+				PRODUCT_BUNDLE_IDENTIFIER = com.Growthfile.GrowthfileNewApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 4.2;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -450,6 +460,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = SAAX8C4X6E;
 				INFOPLIST_FILE = GrowthfileNew/Info.plist;
@@ -457,10 +468,11 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.growthfile.GrowthfileNew;
+				PRODUCT_BUNDLE_IDENTIFIER = com.Growthfile.GrowthfileNewApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 4.2;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};
@@ -481,7 +493,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/GrowthfileNew.app/GrowthfileNew";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/GrowthfileNewApp.app/GrowthfileNewApp";
 			};
 			name = Debug;
 		};
@@ -502,7 +514,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/GrowthfileNew.app/GrowthfileNew";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/GrowthfileNewApp.app/GrowthfileNewApp";
 			};
 			name = Release;
 		};
@@ -549,7 +561,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		352C2DF9218DBC10004B694F /* Build configuration list for PBXProject "GrowthfileNew" */ = {
+		352C2DF9218DBC10004B694F /* Build configuration list for PBXProject "GrowthfileNewApp" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				352C2E24218DBC12004B694F /* Debug */,
@@ -558,7 +570,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		352C2E26218DBC12004B694F /* Build configuration list for PBXNativeTarget "GrowthfileNew" */ = {
+		352C2E26218DBC12004B694F /* Build configuration list for PBXNativeTarget "GrowthfileNewApp" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				352C2E27218DBC12004B694F /* Debug */,
@@ -567,7 +579,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		352C2E29218DBC12004B694F /* Build configuration list for PBXNativeTarget "GrowthfileNewTests" */ = {
+		352C2E29218DBC12004B694F /* Build configuration list for PBXNativeTarget "GrowthfileNewAppTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				352C2E2A218DBC12004B694F /* Debug */,
@@ -576,7 +588,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		352C2E2C218DBC12004B694F /* Build configuration list for PBXNativeTarget "GrowthfileNewUITests" */ = {
+		352C2E2C218DBC12004B694F /* Build configuration list for PBXNativeTarget "GrowthfileNewAppUITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				352C2E2D218DBC12004B694F /* Debug */,
