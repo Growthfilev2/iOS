@@ -37,30 +37,34 @@ class Helper{
         let systemName = UIDevice.current.systemName
         let model = UIDevice.current.model
         let brand : String = "apple"
+        let baseOs = "ios"
+        let appVersion = "1.1.0"
         
-        if let receivedData = KeyChainService.load(key: "MyNumber") {
+        var commonString = baseOs+"&"+brand+"&"+model+"&"+appVersion+"&"+systemName;
+        
+        
+        if let receivedData = KeyChainService.load(key: "growthfileNewKey") {
             let result = receivedData.to(type: Int.self)
             let stringResult:String =  String(result);
-            let concat :String = stringResult+"&"+brand+"&"+model+"&"+systemName
-            return concat
+         
+            return commonString+"&"+stringResult
         }
         else {
             
             let uuid: String = KeyChainService.createUniqueID()
             let data = Data(from: uuid)
-            let status = KeyChainService.save(key: "MyNumber", data: data)
-            print("status: ", status)
-            print("data : " , data)
-            print("uuid: " , uuid)
-            let concat:String = uuid+"&"+brand+"&"+model+"&"+systemName
-            return concat
-        }
-    }
-    static func convertImageDataToBase64(image:UIImage) -> Any {
-        let imgData:NSData  = image.pngData()! as NSData
-        let imageBase64 = imgData.base64EncodedString(options: [])
-        
+            let status = KeyChainService.save(key: "growthfileNewKey", data: data)
+            
+            return
+                commonString+"&"+uuid;
 
+        }
+        
+    }
+    
+    static func convertImageDataToBase64(image:UIImage) -> Any {
+        let imgData:NSData  = image.jpegData(compressionQuality: 0.1)! as NSData
+        let imageBase64 = imgData.base64EncodedString(options:[])
         return imageBase64
     }
    

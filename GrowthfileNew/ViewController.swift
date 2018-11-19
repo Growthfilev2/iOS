@@ -77,7 +77,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
     
     @objc func startPullToRef(refresh:UIRefreshControl){
         
-        webView.evaluateJavaScript("requestCreator('Null')",completionHandler: {(result,error) in
+        webView.evaluateJavaScript("requestCreator('Null','false')",completionHandler: {(result,error) in
             if error == nil {
             
                 self.refreshController.endRefreshing()
@@ -94,7 +94,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         print("view will load")
         // Do any additional setup after loading the view, typically from a nib.
 
-        let request = URLRequest(url:URL(string:"https://ios-testing-5796.firebaseapp.com")!)
+        let request = URLRequest(url:URL(string:"https://growthfile-testing.firebaseapp.com")!)
         webView.navigationDelegate = self
         
         webView.load(request)
@@ -119,7 +119,9 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         print("webview has finished loading")
         let deviceInfo:String = Helper.generateDeviceIdentifier()
         print(deviceInfo)
-        webView.evaluateJavaScript("localStorage.setItem('iosUUID','\(deviceInfo)')", completionHandler: {(result,error) in
+        
+        webView.evaluateJavaScript("native.setName('Ios')", completionHandler: nil);
+        webView.evaluateJavaScript("native.setIosInfo('\(deviceInfo)')", completionHandler: {(result,error) in
             if error == nil {
                 print("no error")
             }
@@ -143,10 +145,28 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         if message.name == "takeImageForAttachment" {
             openCamera()
         }
+        if message.name == "updateApp" {
+            updateApp(appLink: message.body as! String)
+        }
     }
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
     }
     
+}
+extension ViewController {
+    func simpleAlert(title:String,message:String) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: UIAlertController.Style.alert)
+        self.present(alert, animated: true, completion: nil)
+    }
+    
+    func updateApp(appLink:String){
+        let alert = UIAlertController(title: "Message", message: "There is a New version of your app available", preferredStyle: UIAlertController.Style.alert)
+    
+        alert.addAction(UIAlertAction(title: "Update", style: UIAlertAction.Style.default, handler: {( alert : UIAlertAction!) in
+UIApplication.shared.open((URL(string: "itms://itunes.apple.com/app/" + appLink)!), options:[:], completionHandler: nil)
+        }))
+        self.present(alert, animated: true, completion: nil)
+    }
 }
