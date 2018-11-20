@@ -62,7 +62,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         let userContentController = WKUserContentController()
 
         userContentController.add(self,name:"takeImageForAttachment")
-        
+        userContentController.add(self,name:"updateApp")
         configuration.userContentController = userContentController
         
        
@@ -79,14 +79,12 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         
         webView.evaluateJavaScript("requestCreator('Null','false')",completionHandler: {(result,error) in
             if error == nil {
-            
                 self.refreshController.endRefreshing()
             }
             else {
                 print(error)
             }
         })
-    
 }
     
     override func viewDidLoad() {
@@ -94,7 +92,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         print("view will load")
         // Do any additional setup after loading the view, typically from a nib.
 
-        let request = URLRequest(url:URL(string:"https://growthfile-testing.firebaseapp.com")!)
+        let request = URLRequest(url:URL(string:"https://growthfile-207204.firebaseapp.com")!)
         webView.navigationDelegate = self
         
         webView.load(request)
@@ -142,12 +140,24 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
     
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         print(message.name)
+        
         if message.name == "takeImageForAttachment" {
             openCamera()
         }
+        
         if message.name == "updateApp" {
-            updateApp(appLink: message.body as! String)
+            print(message.body)
+            print(message.name)
+            let link:String = message.body as! String
+            let alert = UIAlertController(title: "Message", message: "There is a New version of your app available", preferredStyle: UIAlertController.Style.alert)
+            
+            alert.addAction(UIAlertAction(title: "Update", style: UIAlertAction.Style.default, handler: {( alert : UIAlertAction!) in
+                UIApplication.shared.open((URL(string: "itms://itunes.apple.com/app/" + link)!), options:[:], completionHandler: nil)
+            }))
+            self.present(alert, animated: true, completion: nil)
+          
         }
+    
     }
     
     override func didReceiveMemoryWarning() {
@@ -158,15 +168,6 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
 extension ViewController {
     func simpleAlert(title:String,message:String) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: UIAlertController.Style.alert)
-        self.present(alert, animated: true, completion: nil)
-    }
-    
-    func updateApp(appLink:String){
-        let alert = UIAlertController(title: "Message", message: "There is a New version of your app available", preferredStyle: UIAlertController.Style.alert)
-    
-        alert.addAction(UIAlertAction(title: "Update", style: UIAlertAction.Style.default, handler: {( alert : UIAlertAction!) in
-UIApplication.shared.open((URL(string: "itms://itunes.apple.com/app/" + appLink)!), options:[:], completionHandler: nil)
-        }))
         self.present(alert, animated: true, completion: nil)
     }
 }

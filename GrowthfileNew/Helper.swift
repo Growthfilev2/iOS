@@ -38,7 +38,7 @@ class Helper{
         let model = UIDevice.current.model
         let brand : String = "apple"
         let baseOs = "ios"
-        let appVersion = "1.1.0"
+        let appVersion = "2"
         
         var commonString = baseOs+"&"+brand+"&"+model+"&"+appVersion+"&"+systemName;
         
