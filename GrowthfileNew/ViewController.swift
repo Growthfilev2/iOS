@@ -63,6 +63,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
 
         userContentController.add(self,name:"takeImageForAttachment")
         userContentController.add(self,name:"updateApp")
+        userContentController.add(self,name:"checkInternet")
         configuration.userContentController = userContentController
         
        
@@ -90,11 +91,19 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
     override func viewDidLoad() {
         super.viewDidLoad()
         print("view will load")
+        let request:URLRequest;
         // Do any additional setup after loading the view, typically from a nib.
+        if Reachability.isConnectedToNetwork() {
+          request = URLRequest(url:URL(string:"https://growthfile-207204.firebaseapp.com")!)
+            print("network avaiable")
+        }
+        else {
+            request = URLRequest(url:URL(string:"https://growthfile-207204.firebaseapp.com")!, cachePolicy:.returnCacheDataElseLoad)
 
-        let request = URLRequest(url:URL(string:"https://growthfile-207204.firebaseapp.com")!)
+            print("network not available")
+        }
+       
         webView.navigationDelegate = self
-        
         webView.load(request)
 
     }
@@ -102,7 +111,6 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
     override func viewDidAppear(_ animated: Bool) {
         print("apperance started")
         super.viewDidAppear(animated)
-   
     }
     
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error : Error) {
@@ -110,6 +118,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
     }
     func webView(_ webView:WKWebView, didStartProvisionalNavigation navigation :WKNavigation!) {
         print("Start to load")
+       
     }
     
     
@@ -117,7 +126,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         print("webview has finished loading")
         let deviceInfo:String = Helper.generateDeviceIdentifier()
         print(deviceInfo)
-        
+       
         webView.evaluateJavaScript("native.setName('Ios')", completionHandler: nil);
         webView.evaluateJavaScript("native.setIosInfo('\(deviceInfo)')", completionHandler: {(result,error) in
             if error == nil {
@@ -146,16 +155,29 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         }
         
         if message.name == "updateApp" {
-            print(message.body)
-            print(message.name)
-            let link:String = message.body as! String
+            
             let alert = UIAlertController(title: "Message", message: "There is a New version of your app available", preferredStyle: UIAlertController.Style.alert)
             
             alert.addAction(UIAlertAction(title: "Update", style: UIAlertAction.Style.default, handler: {( alert : UIAlertAction!) in
-                UIApplication.shared.open((URL(string: "itms://itunes.apple.com/app/" + link)!), options:[:], completionHandler: nil)
+                UIApplication.shared.open((URL(string: "itms-apps://itunes.apple.com/app/1441388774")!), options:[:], completionHandler: nil)
             }))
             self.present(alert, animated: true, completion: nil)
-          
+        }
+        
+        if message.name == "checkInternet" {
+            
+            if Reachability.isConnectedToNetwork() {
+                print("can get to netowkr")
+                let messageString = "{connected:true}"
+                webView.evaluateJavaScript("iosConnectivity(\(messageString))", completionHandler: nil)
+            }
+            
+            else {
+                print("problem getting to network")
+                
+                simpleAlert(title: "Message", message: "Please check your internet connection")
+                webView.evaluateJavaScript("iosConnectivity({connected:false})", completionHandler: nil)
+            }
         }
     
     }
@@ -168,6 +190,8 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
 extension ViewController {
     func simpleAlert(title:String,message:String) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: UIAlertController.Style.alert)
+        alert.addAction(UIAlertAction(title: "Okay", style: UIAlertAction.Style.default))
         self.present(alert, animated: true, completion: nil)
     }
+   
 }

@@ -16,6 +16,7 @@
 		352C2E22218DBC12004B694F /* GrowthfileNewUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 352C2E21218DBC12004B694F /* GrowthfileNewUITests.swift */; };
 		352C2E30218E94F5004B694F /* Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 352C2E2F218E94F5004B694F /* Helper.swift */; };
 		352C2E32218E9F16004B694F /* KeyChainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 352C2E31218E9F16004B694F /* KeyChainService.swift */; };
+		35F23B6C21A6C0860013396F /* Reachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35F23B6B21A6C0860013396F /* Reachability.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -51,6 +52,7 @@
 		352C2E23218DBC12004B694F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		352C2E2F218E94F5004B694F /* Helper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helper.swift; sourceTree = "<group>"; };
 		352C2E31218E9F16004B694F /* KeyChainService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyChainService.swift; sourceTree = "<group>"; };
+		35F23B6B21A6C0860013396F /* Reachability.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Reachability.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -109,6 +111,7 @@
 				352C2E0D218DBC12004B694F /* Info.plist */,
 				352C2E2F218E94F5004B694F /* Helper.swift */,
 				352C2E31218E9F16004B694F /* KeyChainService.swift */,
+				35F23B6B21A6C0860013396F /* Reachability.swift */,
 			);
 			path = GrowthfileNew;
 			sourceTree = "<group>";
@@ -265,6 +268,7 @@
 				352C2E04218DBC10004B694F /* ViewController.swift in Sources */,
 				352C2E32218E9F16004B694F /* KeyChainService.swift in Sources */,
 				352C2E02218DBC10004B694F /* AppDelegate.swift in Sources */,
+				35F23B6C21A6C0860013396F /* Reachability.swift in Sources */,
 				352C2E30218E94F5004B694F /* Helper.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -38,15 +38,14 @@ class Helper{
         let model = UIDevice.current.model
         let brand : String = "apple"
         let baseOs = "ios"
-        let appVersion = "2"
-        
+        let appVersion = "3"
         var commonString = baseOs+"&"+brand+"&"+model+"&"+appVersion+"&"+systemName;
         
         
         if let receivedData = KeyChainService.load(key: "growthfileNewKey") {
             let result = receivedData.to(type: Int.self)
             let stringResult:String =  String(result);
-         
+            
             return commonString+"&"+stringResult
         }
         else {
@@ -55,9 +54,7 @@ class Helper{
             let data = Data(from: uuid)
             let status = KeyChainService.save(key: "growthfileNewKey", data: data)
             
-            return
-                commonString+"&"+uuid;
-
+            return commonString+"&"+uuid;
         }
         
     }
