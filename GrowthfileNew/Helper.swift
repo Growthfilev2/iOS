@@ -41,11 +41,9 @@ class Helper{
         let appVersion = "4"
         var commonString = baseOs+"&"+brand+"&"+model+"&"+appVersion+"&"+systemName;
         
-        
         if let receivedData = KeyChainService.load(key: "growthfileNewKey") {
             let result = receivedData.to(type: Int.self)
             let stringResult:String =  String(result);
-            
             return commonString+"&"+stringResult
         }
         else {
@@ -53,10 +51,8 @@ class Helper{
             let uuid: String = KeyChainService.createUniqueID()
             let data = Data(from: uuid)
             let status = KeyChainService.save(key: "growthfileNewKey", data: data)
-            
             return commonString+"&"+uuid;
         }
-        
     }
     
     static func convertImageDataToBase64(image:UIImage) -> Any {
@@ -64,5 +60,4 @@ class Helper{
         let imageBase64 = imgData.base64EncodedString(options:[])
         return imageBase64
     }
-   
 }

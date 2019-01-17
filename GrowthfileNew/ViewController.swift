@@ -6,13 +6,14 @@
 //  Copyright © 2018 Puja Capital. All rights reserved.
 //
 
+
 import UIKit
 import WebKit
 import Foundation
 import Firebase
 class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHandler,UIImagePickerControllerDelegate,UINavigationControllerDelegate  {
 
-    @IBOutlet var webView: WKWebView!
+    @IBOutlet  var webView: WKWebView!
 
     var refreshController : UIRefreshControl = UIRefreshControl()
     
@@ -38,6 +39,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
             let base64Image = Helper.convertImageDataToBase64(image:pickedImage)
            
             let setFilePath = "setFilePath('\(base64Image)')"
+            
             webView.evaluateJavaScript(setFilePath) {(result,error) in
                 if error == nil {
                     print ("success in sending base64 image to js")
@@ -119,6 +121,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
     }
     func webView(_ webView:WKWebView, didStartProvisionalNavigation navigation :WKNavigation!) {
         print("Start to load")
+        
        
     }
     
@@ -133,19 +136,31 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
             if error == nil {
                 print("no error")
             }
+                
             else {
                 print(" js execution error at ", error as Any)
             }
         })
-        
-        InstanceID.instanceID().instanceID { (result, error) in
+     
+        InstanceID.instanceID().instanceID(handler: { (result, error) in
             if let error = error {
-                print("Error fetching remote instance ID: \(error)")
-            } else if let result = result {
-                print("Remote instance ID token: \(result.token)")
-                self.instanceIDTokenMessage.text  = "Remote InstanceID token: \(result.token)"
+                print("Error fetching remote instange ID: \(error)")
             }
-        }
+            else if let result = result {
+                webView.evaluateJavaScript("native.setFCMToken('\(result.token)')", completionHandler: {(result,error) in
+                    if error == nil {
+                        print("no error whilst regiesteriton token")
+                    }
+                    else {
+                        print("error occured at registering token from ios ", error as Any)
+                    }
+                })
+                
+                print("Remote instance ID token: \(result.token)")
+            }
+        })
+       
+            
         
         
         refreshController.bounds = CGRect.init(x: 0.0, y: 50.0, width: refreshController.bounds.size.width, height: refreshController.bounds.size.height)
@@ -154,7 +169,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         webView.scrollView.addSubview(refreshController)
         
     }
-    
+ 
     
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         print(message.name)
