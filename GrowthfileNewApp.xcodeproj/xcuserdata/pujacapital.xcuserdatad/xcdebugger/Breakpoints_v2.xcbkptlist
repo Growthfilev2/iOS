@@ -127,7 +127,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "192"
             endingLineNumber = "192"
-            landmarkName = "simpleAlert(title:message:)"
+            landmarkName = "userContentController(_:didReceive:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -143,8 +143,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "193"
             endingLineNumber = "193"
-            landmarkName = "simpleAlert(title:message:)"
-            landmarkType = "7">
+            landmarkName = "ViewController"
+            landmarkType = "3">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -159,7 +159,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "194"
             endingLineNumber = "194"
-            landmarkName = "simpleAlert(title:message:)"
+            landmarkName = "didReceiveMemoryWarning()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

@@ -9,6 +9,7 @@
 import UIKit
 import WebKit
 import Foundation
+import Firebase
 class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHandler,UIImagePickerControllerDelegate,UINavigationControllerDelegate  {
 
     @IBOutlet var webView: WKWebView!
@@ -94,11 +95,11 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         let request:URLRequest;
         // Do any additional setup after loading the view, typically from a nib.
         if Reachability.isConnectedToNetwork() {
-          request = URLRequest(url:URL(string:"https://growthfile-207204.firebaseapp.com")!)
+          request = URLRequest(url:URL(string:"https://growthfile-testing.firebaseapp.com")!)
             print("network avaiable")
         }
         else {
-            request = URLRequest(url:URL(string:"https://growthfile-207204.firebaseapp.com")!, cachePolicy:.returnCacheDataElseLoad)
+            request = URLRequest(url:URL(string:"https://growthfile-testing.firebaseapp.com")!, cachePolicy:.returnCacheDataElseLoad)
 
             print("network not available")
         }
@@ -137,6 +138,14 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
             }
         })
         
+        InstanceID.instanceID().instanceID { (result, error) in
+            if let error = error {
+                print("Error fetching remote instance ID: \(error)")
+            } else if let result = result {
+                print("Remote instance ID token: \(result.token)")
+                self.instanceIDTokenMessage.text  = "Remote InstanceID token: \(result.token)"
+            }
+        }
         
         
         refreshController.bounds = CGRect.init(x: 0.0, y: 50.0, width: refreshController.bounds.size.width, height: refreshController.bounds.size.height)
