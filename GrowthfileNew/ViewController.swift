@@ -12,7 +12,9 @@ import WebKit
 import Foundation
 import Firebase
 class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHandler,UIImagePickerControllerDelegate,UINavigationControllerDelegate  {
-
+    
+  
+    
     @IBOutlet  var webView: WKWebView!
 
     var refreshController : UIRefreshControl = UIRefreshControl()
@@ -106,9 +108,17 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
             print("network not available")
         }
        
+        NotificationCenter.default.addObserver(self, selector:#selector(callReadInJs), name: UIApplication.willEnterForegroundNotification, object: nil)
+        
+       
         webView.navigationDelegate = self
         webView.load(request)
 
+    }
+    
+   
+    @objc func callReadInJs(){
+         webView.evaluateJavaScript("runRead()", completionHandler: nil)
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -121,8 +131,6 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
     }
     func webView(_ webView:WKWebView, didStartProvisionalNavigation navigation :WKNavigation!) {
         print("Start to load")
-        
-       
     }
     
     
@@ -160,17 +168,12 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
             }
         })
        
-            
-        
-        
         refreshController.bounds = CGRect.init(x: 0.0, y: 50.0, width: refreshController.bounds.size.width, height: refreshController.bounds.size.height)
         refreshController.addTarget(self, action: #selector(self.startPullToRef(refresh:)), for: .valueChanged)
         refreshController.attributedTitle = NSAttributedString(string: "Loading")
         webView.scrollView.addSubview(refreshController)
-        
     }
  
-    
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         print(message.name)
         

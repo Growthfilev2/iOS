@@ -113,10 +113,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if locationServiceAvailable == false {
             locationAlert(title: "Location Service is Disabled",message:"Please Enable Location Services to use Growthfile")
         }
+        
     }
 
     func applicationWillTerminate(_ application: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
+        
+        
     }
     
 }
