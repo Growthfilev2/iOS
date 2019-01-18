@@ -109,16 +109,30 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         }
        
         NotificationCenter.default.addObserver(self, selector:#selector(callReadInJs), name: UIApplication.willEnterForegroundNotification, object: nil)
-        
-       
+      
+        NotificationCenter.default.addObserver(self, selector:#selector(retrieveUpdatedTokenFromNotificationDict(_:)), name: NSNotification.Name(rawValue:"RefreshedToken" ),object:nil)
+
+
         webView.navigationDelegate = self
         webView.load(request)
 
     }
     
+    @objc func displayNot(_ notification: NSNotification){
+        if let dict = notification.userInfo as NSDictionary? {
+             self.webView.evaluateJavaScript("snacks('\(dict["token"]!)')", completionHandler: nil)
+        }
+    }
    
     @objc func callReadInJs(){
          webView.evaluateJavaScript("runRead()", completionHandler: nil)
+    }
+    
+    @objc func retrieveUpdatedTokenFromNotificationDict(_ notification :NSNotification){
+        if let dict = notification.userInfo as NSDictionary? {
+            let newToken:String = dict["updateToken"]! as! String
+            setFcmTokenToJsStorage(token: newToken);
+        }
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -129,6 +143,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error : Error) {
         print(error.localizedDescription)
     }
+    
     func webView(_ webView:WKWebView, didStartProvisionalNavigation navigation :WKNavigation!) {
         print("Start to load")
     }
@@ -149,22 +164,16 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
                 print(" js execution error at ", error as Any)
             }
         })
-     
+        
+        
         InstanceID.instanceID().instanceID(handler: { (result, error) in
             if let error = error {
                 print("Error fetching remote instange ID: \(error)")
             }
             else if let result = result {
-                webView.evaluateJavaScript("native.setFCMToken('\(result.token)')", completionHandler: {(result,error) in
-                    if error == nil {
-                        print("no error whilst regiesteriton token")
-                    }
-                    else {
-                        print("error occured at registering token from ios ", error as Any)
-                    }
-                })
-                
                 print("Remote instance ID token: \(result.token)")
+                self.setFcmTokenToJsStorage(token:result.token)
+            
             }
         })
        
@@ -174,6 +183,19 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         webView.scrollView.addSubview(refreshController)
     }
  
+    func setFcmTokenToJsStorage(token:String){
+        
+        self.webView.evaluateJavaScript("native.setFCMToken('\(token)')", completionHandler: {(result,error) in
+            if error == nil {
+                print("no error whilst regiesteriton token")
+            }
+            else {
+                print("error occured at registering token from ios ", error as Any)
+            }
+        })
+        
+    }
+  
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         print(message.name)
         
