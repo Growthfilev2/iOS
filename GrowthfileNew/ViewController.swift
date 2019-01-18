@@ -11,6 +11,7 @@ import UIKit
 import WebKit
 import Foundation
 import Firebase
+import UserNotifications
 class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHandler,UIImagePickerControllerDelegate,UINavigationControllerDelegate  {
     
   
@@ -108,23 +109,20 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
             print("network not available")
         }
        
-        NotificationCenter.default.addObserver(self, selector:#selector(callReadInJs), name: UIApplication.willEnterForegroundNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector:#selector(callReadInJs), name: UIApplication.didBecomeActiveNotification, object: nil)
       
         NotificationCenter.default.addObserver(self, selector:#selector(retrieveUpdatedTokenFromNotificationDict(_:)), name: NSNotification.Name(rawValue:"RefreshedToken" ),object:nil)
-
+        
+        NotificationCenter.default.addObserver(self, selector:#selector(callReadInJs), name: NSNotification.Name(rawValue: "fcmMessageReceived"), object: nil)
 
         webView.navigationDelegate = self
         webView.load(request)
 
     }
     
-    @objc func displayNot(_ notification: NSNotification){
-        if let dict = notification.userInfo as NSDictionary? {
-             self.webView.evaluateJavaScript("snacks('\(dict["token"]!)')", completionHandler: nil)
-        }
-    }
-   
+    
     @objc func callReadInJs(){
+        print("view become active from controller")
          webView.evaluateJavaScript("runRead()", completionHandler: nil)
     }
     
@@ -133,6 +131,12 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
             let newToken:String = dict["updateToken"]! as! String
             setFcmTokenToJsStorage(token: newToken);
         }
+    }
+    
+    func setFcmDenied(denied:Bool){
+        DispatchQueue.main.async(execute: {
+            self.webView.evaluateJavaScript("fcmDenied(\(denied))", completionHandler: nil)
+        })
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -165,6 +169,17 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
             }
         })
         
+        let currentNotificationStatus = UNUserNotificationCenter.current()
+        currentNotificationStatus.getNotificationSettings(completionHandler: {(settings) in
+            var denied:Bool = true
+            if settings.authorizationStatus == .denied {
+                self.setFcmDenied(denied: denied)
+            }
+            if settings.authorizationStatus == .authorized {
+                denied = false
+               self.setFcmDenied(denied: denied)
+            }
+        })
         
         InstanceID.instanceID().instanceID(handler: { (result, error) in
             if let error = error {

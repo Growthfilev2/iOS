@@ -33,14 +33,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if #available(iOS 10.0, *) {
             // For iOS 10 display notification (sent via APNS)
             UNUserNotificationCenter.current().delegate = self as? UNUserNotificationCenterDelegate
+            
             let authOptions: UNAuthorizationOptions = [.alert, .badge, .sound]
+            
             UNUserNotificationCenter.current().requestAuthorization(
                 options: authOptions,
                 completionHandler: {_, _ in })
-        } else {
-            let settings: UIUserNotificationSettings =
-                UIUserNotificationSettings(types: [.alert, .badge, .sound], categories: nil)
-            application.registerUserNotificationSettings(settings)
         }
         
         application.registerForRemoteNotifications()
@@ -94,6 +92,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             locationAlert(title: "Location Service is Disabled",message:"Please Enable Location Services to use Growthfile")
         }
         
+        
     }
 
     func applicationWillTerminate(_ application: UIApplication) {
@@ -132,8 +131,17 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
     func userNotificationCenter(_ center: UNUserNotificationCenter,
                                 willPresent notification: UNNotification,
                                 withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
-        let userInfo = notification.request.content.userInfo
-        completionHandler([.alert])
+        
+        if UIApplication.shared.applicationState == .active{
+            completionHandler([])
+        }
+        else {
+            completionHandler([.alert,.sound])
+        }
+        
+        NotificationCenter.default.post(name:NSNotification.Name(rawValue: "fcmMessageReceived"),object:nil,userInfo:nil)
+
+        
     }
     
     
