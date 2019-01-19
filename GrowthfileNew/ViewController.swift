@@ -100,21 +100,22 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         let request:URLRequest;
         // Do any additional setup after loading the view, typically from a nib.
         if Reachability.isConnectedToNetwork() {
-          request = URLRequest(url:URL(string:"https://growthfile-testing.firebaseapp.com")!)
+          request = URLRequest(url:URL(string:"https://growthfile-207204.firebaseapp.com")!)
             print("network avaiable")
         }
         else {
-            request = URLRequest(url:URL(string:"https://growthfile-testing.firebaseapp.com")!, cachePolicy:.returnCacheDataElseLoad)
-
+            request = URLRequest(url:URL(string:"https://growthfile-207204.firebaseapp.com")!, cachePolicy:.returnCacheDataElseLoad)
             print("network not available")
         }
        
+        
         NotificationCenter.default.addObserver(self, selector:#selector(callReadInJs), name: UIApplication.didBecomeActiveNotification, object: nil)
       
         NotificationCenter.default.addObserver(self, selector:#selector(retrieveUpdatedTokenFromNotificationDict(_:)), name: NSNotification.Name(rawValue:"RefreshedToken" ),object:nil)
         
         NotificationCenter.default.addObserver(self, selector:#selector(callReadInJs), name: NSNotification.Name(rawValue: "fcmMessageReceived"), object: nil)
 
+        
         webView.navigationDelegate = self
         webView.load(request)
 
@@ -133,12 +134,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         }
     }
     
-    func setFcmDenied(denied:Bool){
-        DispatchQueue.main.async(execute: {
-            self.webView.evaluateJavaScript("fcmDenied(\(denied))", completionHandler: nil)
-        })
-    }
-    
+  
     override func viewDidAppear(_ animated: Bool) {
         print("apperance started")
         super.viewDidAppear(animated)
@@ -169,17 +165,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
             }
         })
         
-        let currentNotificationStatus = UNUserNotificationCenter.current()
-        currentNotificationStatus.getNotificationSettings(completionHandler: {(settings) in
-            var denied:Bool = true
-            if settings.authorizationStatus == .denied {
-                self.setFcmDenied(denied: denied)
-            }
-            if settings.authorizationStatus == .authorized {
-                denied = false
-               self.setFcmDenied(denied: denied)
-            }
-        })
+       
         
         InstanceID.instanceID().instanceID(handler: { (result, error) in
             if let error = error {

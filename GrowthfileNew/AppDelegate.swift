@@ -91,8 +91,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if locationServiceAvailable == false {
             locationAlert(title: "Location Service is Disabled",message:"Please Enable Location Services to use Growthfile")
         }
-        
-        
     }
 
     func applicationWillTerminate(_ application: UIApplication) {
@@ -140,10 +138,7 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
         }
         
         NotificationCenter.default.post(name:NSNotification.Name(rawValue: "fcmMessageReceived"),object:nil,userInfo:nil)
-
-        
     }
-    
     
     /// Handle tap on the notification banner
     ///
