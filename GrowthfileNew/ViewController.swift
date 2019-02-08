@@ -12,16 +12,14 @@ import WebKit
 import Foundation
 import Firebase
 import UserNotifications
-class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHandler,UIImagePickerControllerDelegate,UINavigationControllerDelegate  {
-    
-  
-    
+import CoreLocation
+class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHandler,UIImagePickerControllerDelegate,UINavigationControllerDelegate,CLLocationManagerDelegate  {
     @IBOutlet  var webView: WKWebView!
-
+    var locationManager:CLLocationManager!
+    var didFindLocation:Bool = false;
+    
     var refreshController : UIRefreshControl = UIRefreshControl()
-    
      func openCamera(){
-    
         if UIImagePickerController.isSourceTypeAvailable(UIImagePickerController.SourceType.camera){
             let imagePicker = UIImagePickerController()
             imagePicker.delegate = self
@@ -70,14 +68,13 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         userContentController.add(self,name:"takeImageForAttachment")
         userContentController.add(self,name:"updateApp")
         userContentController.add(self,name:"checkInternet")
+        userContentController.add(self,name:"startLocationService")
         configuration.userContentController = userContentController
-        
-       
+               
         
         self.view.addSubview(webView)
         self.view.sendSubviewToBack(webView)
-
-        webView = WKWebView(frame: view.bounds, configuration: configuration)
+        webView = WKWebView(frame: view.frame, configuration: configuration)
         
         view = webView
     }
@@ -93,22 +90,22 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
             }
         })
 }
-    
+   
     override func viewDidLoad() {
         super.viewDidLoad()
         print("view will load")
         let request:URLRequest;
+      
         // Do any additional setup after loading the view, typically from a nib.
         if Reachability.isConnectedToNetwork() {
-          request = URLRequest(url:URL(string:"https://growthfile-207204.firebaseapp.com")!)
+          request = URLRequest(url:URL(string:"https://growthfile-testing.firebaseapp.com")!)
             print("network avaiable")
         }
         else {
-            request = URLRequest(url:URL(string:"https://growthfile-207204.firebaseapp.com")!, cachePolicy:.returnCacheDataElseLoad)
+            request = URLRequest(url:URL(string:"https://growthfile-testing.firebaseapp.com")!, cachePolicy:.returnCacheDataElseLoad)
             print("network not available")
         }
        
-        
         NotificationCenter.default.addObserver(self, selector:#selector(callReadInJs), name: UIApplication.didBecomeActiveNotification, object: nil)
       
         NotificationCenter.default.addObserver(self, selector:#selector(retrieveUpdatedTokenFromNotificationDict(_:)), name: NSNotification.Name(rawValue:"RefreshedToken" ),object:nil)
@@ -140,6 +137,41 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         super.viewDidAppear(animated)
     }
     
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        let userLocation:CLLocation = locations[0] as CLLocation
+        
+        // Call stopUpdatingLocation() to stop listening for location updates,
+        // other wise this function will be called every time when user location changes.
+        // manager.stopUpdatingLocation();
+        let jsonObject: NSMutableDictionary = NSMutableDictionary()
+        jsonObject.setValue(userLocation.coordinate.latitude, forKey: "latitude");
+        jsonObject.setValue(userLocation.coordinate.longitude, forKey: "longitude");
+        jsonObject.setValue(userLocation.horizontalAccuracy, forKey: "accuracy");
+
+        let jsonData: NSData
+        do {
+            if(didFindLocation == false) {
+                
+            
+            jsonData = try JSONSerialization.data(withJSONObject: jsonObject, options: JSONSerialization.WritingOptions()) as NSData
+            let jsonString = NSString(data: jsonData as Data, encoding: String.Encoding.utf8.rawValue)! as String
+            print(jsonString)
+                webView.evaluateJavaScript("putIosLocationInRoot(\(jsonString))", completionHandler: nil);
+           
+            }
+            didFindLocation = true
+            
+        } catch _ {
+             print ("JSON Failure")
+        }
+       
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error)
+    {
+        print("Error \(error)")
+    }
+    
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error : Error) {
         print(error.localizedDescription)
     }
@@ -152,20 +184,16 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
     func webView(_ webView:WKWebView, didFinish navigation:WKNavigation!) {
         print("webview has finished loading")
         let deviceInfo:String = Helper.generateDeviceIdentifier()
-        print(deviceInfo)
-       
+        print(deviceInfo);
         webView.evaluateJavaScript("native.setName('Ios')", completionHandler: nil);
         webView.evaluateJavaScript("native.setIosInfo('\(deviceInfo)')", completionHandler: {(result,error) in
             if error == nil {
                 print("no error")
             }
-                
             else {
                 print(" js execution error at ", error as Any)
             }
         })
-        
-       
         
         InstanceID.instanceID().instanceID(handler: { (result, error) in
             if let error = error {
@@ -174,14 +202,14 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
             else if let result = result {
                 print("Remote instance ID token: \(result.token)")
                 self.setFcmTokenToJsStorage(token:result.token)
-            
             }
         })
-       
+        
         refreshController.bounds = CGRect.init(x: 0.0, y: 50.0, width: refreshController.bounds.size.width, height: refreshController.bounds.size.height)
         refreshController.addTarget(self, action: #selector(self.startPullToRef(refresh:)), for: .valueChanged)
         refreshController.attributedTitle = NSAttributedString(string: "Loading")
         webView.scrollView.addSubview(refreshController)
+        
     }
  
     func setFcmTokenToJsStorage(token:String){
@@ -227,6 +255,21 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
                 
                 simpleAlert(title: "Message", message: "Please check your internet connection")
                 webView.evaluateJavaScript("iosConnectivity({connected:false})", completionHandler: nil)
+            }
+        }
+        if message.name == "startLocationService" {
+            didFindLocation = false;
+            locationManager = CLLocationManager()
+            locationManager.delegate = self
+            locationManager.desiredAccuracy = kCLLocationAccuracyBest
+            locationManager.requestAlwaysAuthorization()
+            
+            if CLLocationManager.locationServicesEnabled() {
+                locationManager.startUpdatingLocation()
+                //locationManager.startUpdatingHeading()
+            }
+            else {
+                simpleAlert(title: "Location Service Disabled", message: "Allow Growthfile to use location services");
             }
         }
     

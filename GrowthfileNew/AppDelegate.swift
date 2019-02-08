@@ -48,9 +48,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     permission for notification **/
     
     func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
-        
             print(error.localizedDescription)
-    }
+        }
     
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: Any],
                      fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
@@ -71,10 +70,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func applicationWillEnterForeground(_ application: UIApplication) {
         // Called as part of the transition from the background to the active state; here you can undo many of the changes made on entering the background.
-        
         print("view has beome active")
-    
-
     }
 
     func applicationDidBecomeActive(_ application: UIApplication) {
@@ -83,10 +79,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             print("no connection")
             connectionAlert(title: "Message", message: "Please make sure you have a working Internet Connection")
         }
-        
-        print("View really became active")
-        // if location service is disabled , show alert box with message
-        
+                // if location service is disabled , show alert box with message
         let locationServiceAvailable =  Helper.checkLocationServiceState()
         if locationServiceAvailable == false {
             locationAlert(title: "Location Service is Disabled",message:"Please Enable Location Services to use Growthfile")
@@ -118,7 +111,6 @@ extension MessagingDelegate {
         print("Firebase registration token: \(fcmToken)")
         let fcmToken:[String:String] = ["updatedToken":fcmToken]
         NotificationCenter.default.post(name: NSNotification.Name(rawValue: "RefreshedToken"),object:nil,userInfo:fcmToken)
-
     }
 }
 

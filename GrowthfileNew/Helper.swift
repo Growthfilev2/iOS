@@ -23,6 +23,8 @@ class Helper{
                 return false
             case .authorizedWhenInUse:
                 return true
+            case .authorizedAlways:
+                return true
             default:
                 return false
             }
@@ -39,7 +41,8 @@ class Helper{
         let brand : String = "apple"
         let baseOs = "ios"
         let appVersion = "4"
-        var commonString = baseOs+"&"+brand+"&"+model+"&"+appVersion+"&"+systemName;
+        let commonString = baseOs+"&"+brand+"&"+model+"&"+appVersion+"&"+systemName;
+        
         
         if let receivedData = KeyChainService.load(key: "growthfileNewKey") {
             let result = receivedData.to(type: Int.self)
@@ -50,7 +53,7 @@ class Helper{
             
             let uuid: String = KeyChainService.createUniqueID()
             let data = Data(from: uuid)
-            let status = KeyChainService.save(key: "growthfileNewKey", data: data)
+            KeyChainService.save(key: "growthfileNewKey", data: data)
             return commonString+"&"+uuid;
         }
     }
