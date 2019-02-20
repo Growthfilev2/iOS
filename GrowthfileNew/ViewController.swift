@@ -17,6 +17,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
     @IBOutlet  var webView: WKWebView!
     var locationManager:CLLocationManager!
     var didFindLocation:Bool = false;
+    weak var weakTimer: Timer?
     
     var refreshController : UIRefreshControl = UIRefreshControl()
      func openCamera(){
@@ -131,40 +132,49 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         }
     }
     
+    @objc func timerMethod(){
+        didFindLocation = false;
+        locationManager = CLLocationManager()
+        locationManager.delegate = self
+        locationManager.desiredAccuracy = kCLLocationAccuracyBest
+        locationManager.requestAlwaysAuthorization();
+        locationManager.startUpdatingLocation();
+       
+    }
   
     override func viewDidAppear(_ animated: Bool) {
         print("apperance started")
         super.viewDidAppear(animated)
     }
     
+  
+    
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         let userLocation:CLLocation = locations[0] as CLLocation
         
-        // Call stopUpdatingLocation() to stop listening for location updates,
-        // other wise this function will be called every time when user location changes.
-        // manager.stopUpdatingLocation();
         let jsonObject: NSMutableDictionary = NSMutableDictionary()
         jsonObject.setValue(userLocation.coordinate.latitude, forKey: "latitude");
         jsonObject.setValue(userLocation.coordinate.longitude, forKey: "longitude");
         jsonObject.setValue(userLocation.horizontalAccuracy, forKey: "accuracy");
+        jsonObject.setValue("Ios", forKey: "provider")
 
         let jsonData: NSData
         do {
             if(didFindLocation == false) {
                 
-            
+            print(userLocation.coordinate.latitude)
+            print(userLocation.coordinate.longitude);
+                print(userLocation.horizontalAccuracy);
             jsonData = try JSONSerialization.data(withJSONObject: jsonObject, options: JSONSerialization.WritingOptions()) as NSData
             let jsonString = NSString(data: jsonData as Data, encoding: String.Encoding.utf8.rawValue)! as String
             print(jsonString)
-                webView.evaluateJavaScript("putIosLocationInRoot(\(jsonString))", completionHandler: nil);
-           
+                webView.evaluateJavaScript("updateLocationInRoot(\(jsonString))", completionHandler: nil);
             }
             didFindLocation = true
             
         } catch _ {
-             print ("JSON Failure")
+            webView.evaluateJavaScript("getLocation()", completionHandler: nil)
         }
-       
     }
     
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error)
@@ -258,15 +268,9 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
             }
         }
         if message.name == "startLocationService" {
-            didFindLocation = false;
-            locationManager = CLLocationManager()
-            locationManager.delegate = self
-            locationManager.desiredAccuracy = kCLLocationAccuracyBest
-            locationManager.requestAlwaysAuthorization()
             
             if CLLocationManager.locationServicesEnabled() {
-                locationManager.startUpdatingLocation()
-                //locationManager.startUpdatingHeading()
+                self.weakTimer = Timer.scheduledTimer(timeInterval: 5, target: self, selector: #selector(self.timerMethod), userInfo: nil, repeats: true)
             }
             else {
                 simpleAlert(title: "Location Service Disabled", message: "Allow Growthfile to use location services");

@@ -128,7 +128,6 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
         else {
             completionHandler([.alert,.sound])
         }
-        
         NotificationCenter.default.post(name:NSNotification.Name(rawValue: "fcmMessageReceived"),object:nil,userInfo:nil)
     }
     
