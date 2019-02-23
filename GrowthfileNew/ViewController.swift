@@ -99,17 +99,19 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
       
         // Do any additional setup after loading the view, typically from a nib.
         if Reachability.isConnectedToNetwork() {
-          request = URLRequest(url:URL(string:"https://growthfile-testing.firebaseapp.com")!)
+         
+            
+          request = URLRequest(url:URL(string:"https://growthfile-207204.firebaseapp.com")!)
             print("network avaiable")
         }
         else {
-            request = URLRequest(url:URL(string:"https://growthfile-testing.firebaseapp.com")!, cachePolicy:.returnCacheDataElseLoad)
+            request = URLRequest(url:URL(string:"https://growthfile-207204.firebaseapp.com")!, cachePolicy:.returnCacheDataElseLoad)
             print("network not available")
         }
        
-        NotificationCenter.default.addObserver(self, selector:#selector(callReadInJs), name: UIApplication.didBecomeActiveNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector:#selector(foregroundRead), name: UIApplication.didBecomeActiveNotification, object: nil)
       
-        NotificationCenter.default.addObserver(self, selector:#selector(retrieveUpdatedTokenFromNotificationDict(_:)), name: NSNotification.Name(rawValue:"RefreshedToken" ),object:nil)
+        NotificationCenter.default.addObserver(self, selector:#selector(retrieveUpdatedTokenFromNotificationDict(_:)), name: NSNotification.Name(rawValue:"RefreshedToken"),object:nil)
         
         NotificationCenter.default.addObserver(self, selector:#selector(callReadInJs), name: NSNotification.Name(rawValue: "fcmMessageReceived"), object: nil)
 
@@ -119,10 +121,46 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
 
     }
     
+    @objc func foregroundRead(){
+        webView.evaluateJavaScript("runRead()", completionHandler: nil)
+    }
     
-    @objc func callReadInJs(){
-        print("view become active from controller")
+    @objc func callReadInJs(notification: NSNotification){
+       
+        let jsonObject: NSMutableDictionary = NSMutableDictionary()
+      
+        let runRead = notification.userInfo?["read"]
+        let verifyEmail = notification.userInfo?["verifyEmail"]
+        let removeOffice = notification.userInfo?["removedFromOffice"]
+        
+        if((runRead) != nil){
+            jsonObject.setValue(runRead, forKey: "read");
+        }
+        if((verifyEmail) != nil) {
+            jsonObject.setValue(verifyEmail, forKey: "verifyEmail")
+        }
+        if((removeOffice) != nil){
+            jsonObject.setValue(removeOffice, forKey: "removedFromOffice")
+        }
+        
+        let jsonData: NSData
+        do {
+            if(jsonObject.count > 0) {
+                
+            
+            jsonData = try JSONSerialization.data(withJSONObject: jsonObject, options: JSONSerialization.WritingOptions()) as NSData
+            
+            let jsonString = NSString(data: jsonData as Data, encoding: String.Encoding.utf8.rawValue)! as String
+            print(jsonString)
+            webView.evaluateJavaScript("runRead(\(jsonString))", completionHandler: nil)
+            }
+            else {
+                webView.evaluateJavaScript("runRead()", completionHandler: nil)
+            }
+        }
+        catch{
          webView.evaluateJavaScript("runRead()", completionHandler: nil)
+        }
     }
     
     @objc func retrieveUpdatedTokenFromNotificationDict(_ notification :NSNotification){
@@ -160,26 +198,24 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
 
         let jsonData: NSData
         do {
-            if(didFindLocation == false) {
-                
+            if(didFindLocation == false && userLocation.horizontalAccuracy <= 350) {
             print(userLocation.coordinate.latitude)
             print(userLocation.coordinate.longitude);
-                print(userLocation.horizontalAccuracy);
-            jsonData = try JSONSerialization.data(withJSONObject: jsonObject, options: JSONSerialization.WritingOptions()) as NSData
+            print(userLocation.horizontalAccuracy);
+            jsonData = try JSONSerialization.data(withJSONObject: jsonObject, options:JSONSerialization.WritingOptions()) as NSData
             let jsonString = NSString(data: jsonData as Data, encoding: String.Encoding.utf8.rawValue)! as String
             print(jsonString)
-                webView.evaluateJavaScript("updateLocationInRoot(\(jsonString))", completionHandler: nil);
-            }
+            webView.evaluateJavaScript("updateLocationInRoot(\(jsonString))", completionHandler: nil);
             didFindLocation = true
-            
-        } catch _ {
-            webView.evaluateJavaScript("getLocation()", completionHandler: nil)
+        }
+        } catch let jsonErr {
+            webView.evaluateJavaScript("iosLocationError(\(jsonErr.localizedDescription))", completionHandler: nil)
         }
     }
     
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error)
     {
-        print("Error \(error)")
+       webView.evaluateJavaScript("iosLocationError(\(error.localizedDescription))", completionHandler: nil)
     }
     
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error : Error) {

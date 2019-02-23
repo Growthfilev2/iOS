@@ -128,7 +128,10 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
         else {
             completionHandler([.alert,.sound])
         }
-        NotificationCenter.default.post(name:NSNotification.Name(rawValue: "fcmMessageReceived"),object:nil,userInfo:nil)
+        
+        NotificationCenter.default.post(name:NSNotification.Name(rawValue: "fcmMessageReceived"),object:nil,userInfo:notification.request.content.userInfo)
+        
+        
     }
     
     /// Handle tap on the notification banner
@@ -143,4 +146,6 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
         let userInfo = response.notification.request.content.userInfo
         completionHandler()
 }
+    
+    
 }
