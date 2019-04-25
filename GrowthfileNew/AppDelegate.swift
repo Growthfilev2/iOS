@@ -76,13 +76,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func applicationDidBecomeActive(_ application: UIApplication) {
-        // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
-                // if location service is disabled , show alert box with message
         let locationServiceAvailable =  Helper.checkLocationServiceState()
         if locationServiceAvailable == false {
             locationAlert(title: "Location Service is Disabled",message:"Please Enable Location Services to use Growthfile")
         }
-        
+     
     }
 
     func applicationWillTerminate(_ application: UIApplication) {
@@ -91,14 +89,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
 }
 extension UIApplicationDelegate  {
-    
-func locationAlert(title:String,message:String) -> Void {
-    let alert = UIAlertController(title: title, message: message, preferredStyle: UIAlertController.Style.alert)
-    alert.addAction(UIAlertAction(title: "Go To Settings", style: UIAlertAction.Style.default, handler: {( alert : UIAlertAction!) in
-        UIApplication.shared.open(NSURL(string:UIApplication.openSettingsURLString)! as URL, options:[:],completionHandler: nil)
-    }))
-    self.window??.rootViewController?.present(alert, animated: true, completion: nil)
-}
+    func locationAlert(title:String,message:String) -> Void {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: UIAlertController.Style.alert)
+        alert.addAction(UIAlertAction(title: "Go To Settings", style: UIAlertAction.Style.default, handler: {( alert : UIAlertAction!) in
+            UIApplication.shared.open(NSURL(string:UIApplication.openSettingsURLString)! as URL, options:[:],completionHandler: nil)
+        }));
+        
+       self.window??.rootViewController?.present(alert, animated: true, completion: nil)
+    }
+
     func connectionAlert(title:String,message:String) ->Void{
         let alert = UIAlertController(title: title, message: message, preferredStyle: UIAlertController.Style.alert)
         alert.addAction(UIAlertAction(title: "Okay", style: UIAlertAction.Style.default))

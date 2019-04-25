@@ -18,11 +18,9 @@ import EventKit
 class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHandler,UIImagePickerControllerDelegate,UINavigationControllerDelegate,CLLocationManagerDelegate  {
     @IBOutlet  var webView: WKWebView!
     var activityIndicator: UIActivityIndicatorView!
-
     var locationManager:CLLocationManager!
     var didFindLocation:Bool = false;
     weak var weakTimer: Timer?
-    let eventStore : EKEventStore = EKEventStore()
 
     var refreshController : UIRefreshControl = UIRefreshControl()
      func openCamera(){
@@ -73,9 +71,8 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         userContentController.add(self,name:"takeImageForAttachment")
         userContentController.add(self,name:"updateApp")
         userContentController.add(self,name:"checkInternet")
-        userContentController.add(self,name:"startLocationService")
+        userContentController.add(self,name:"locationService")
         configuration.userContentController = userContentController
-               
         
         self.view.addSubview(webView)
         self.view.sendSubviewToBack(webView)
@@ -104,37 +101,39 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         // Do any additional setup after loading the view, typically from a nib.
         
         if Reachability.isConnectedToNetwork() {
-
-          request = URLRequest(url:URL(string:"https://growthfile-207204.firebaseapp.com/v1/")!)
-            print("network avaiable")
+            request = URLRequest(url:URL(string:"https://growthfile-207204.firebaseapp.com/v1/")!, cachePolicy:.reloadRevalidatingCacheData)
         }
         else {
             request = URLRequest(url:URL(string:"https://growthfile-207204.firebaseapp.com/v1/")!, cachePolicy:.returnCacheDataElseLoad)
-            print("network not available")
         }
 
-        NotificationCenter.default.addObserver(self, selector:#selector(foregroundRead), name: UIApplication.didBecomeActiveNotification, object: nil)
-     
-        NotificationCenter.default.addObserver(self, selector:#selector(retrieveUpdatedTokenFromNotificationDict(_:)), name: NSNotification.Name(rawValue:"RefreshedToken"),object:nil)
-   
-        webView.navigationDelegate = self
         activityIndicator = UIActivityIndicatorView()
         activityIndicator.center = self.view.center
         activityIndicator.hidesWhenStopped = true
         activityIndicator.style = UIActivityIndicatorView.Style.whiteLarge
         activityIndicator.color = UIColor(displayP3Red: 3/255, green: 153/255, blue: 244/255, alpha: 255/255)
         webView.addSubview(activityIndicator)
+        webView.navigationDelegate = self
+
         webView.load(request);
         
+        NotificationCenter.default.addObserver(self, selector:#selector(foregroundRead), name: UIApplication.didBecomeActiveNotification, object: nil)
+        
+        NotificationCenter.default.addObserver(self, selector:#selector(retrieveUpdatedTokenFromNotificationDict(_:)), name: NSNotification.Name(rawValue:"RefreshedToken"),object:nil)
+        
     }
+    
+
     func showActivityIndicator(show: Bool) {
         if show {
             activityIndicator.startAnimating()
+            
         } else {
             activityIndicator.stopAnimating()
         }
     }
     @objc func foregroundRead(){
+      
         webView.evaluateJavaScript("runRead()", completionHandler: nil);
     }
 
@@ -159,6 +158,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
         locationManager.requestAlwaysAuthorization();
         locationManager.startUpdatingLocation();
+       
     }
   
     override func viewDidAppear(_ animated: Bool) {
@@ -185,7 +185,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
             didFindLocation = true
         }
         } catch let jsonErr {
-            webView.evaluateJavaScript("iosLocationError(\(jsonErr.localizedDescription))", completionHandler: nil)
+            webView.evaluateJavaScript("iosLocationError('\(jsonErr.localizedDescription)')", completionHandler: nil)
         }
     }
     
@@ -196,7 +196,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
     
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error)
     {
-       webView.evaluateJavaScript("iosLocationError(\(error.localizedDescription))", completionHandler: nil)
+       webView.evaluateJavaScript("iosLocationError('\(error.localizedDescription)')", completionHandler: nil)
     }
     
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error : Error) {
@@ -315,10 +315,20 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
                 webView.evaluateJavaScript("iosConnectivity({connected:false})", completionHandler: nil)
             }
         }
-        if message.name == "startLocationService" {
+        if message.name == "locationService" {
+            let body = String(describing:message.body);
             
             if CLLocationManager.locationServicesEnabled() {
-                self.weakTimer = Timer.scheduledTimer(timeInterval: 5, target: self, selector: #selector(self.timerMethod), userInfo: nil, repeats: true)
+                if body == "start" {
+                     self.weakTimer = Timer.scheduledTimer(timeInterval: 5, target: self, selector: #selector(self.timerMethod), userInfo: nil, repeats: true)
+                }
+                
+                if body == "stop" {
+                    if(self.weakTimer != nil) {
+                        self.weakTimer!.invalidate();
+                        self.weakTimer = nil;
+                    }
+                }
             }
             else {
                 simpleAlert(title: "Location Service Disabled", message: "Allow Growthfile to use location services");
@@ -338,7 +348,7 @@ extension ViewController {
         alert.addAction(UIAlertAction(title: "Okay", style: UIAlertAction.Style.default))
         self.present(alert, animated: true, completion: nil)
     }
-   
+
 }
 extension Dictionary {
     var jsonStringRepresentaiton: String? {
