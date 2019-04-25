@@ -18,21 +18,22 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     var window: UIWindow?
     let gcmMessageIDKey = "gcm.message_id"
-
+   
     
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
         FirebaseApp.configure()
         registerForPushNotification(application: application)
+ 
         return true
     }
-    
+
+   
     /** Register for receiveing push notifications **/
     
     func registerForPushNotification(application: UIApplication){
         if #available(iOS 10.0, *) {
             // For iOS 10 display notification (sent via APNS)
-            UNUserNotificationCenter.current().delegate = self as? UNUserNotificationCenterDelegate
+            UNUserNotificationCenter.current().delegate = self as UNUserNotificationCenterDelegate
             
             let authOptions: UNAuthorizationOptions = [.alert, .badge, .sound]
             
@@ -54,6 +55,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: Any],
                      fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
         completionHandler(UIBackgroundFetchResult.newData)
+       
     }
     
     func applicationWillResignActive(_ application: UIApplication) {
@@ -75,15 +77,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func applicationDidBecomeActive(_ application: UIApplication) {
         // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
-        if(!Reachability.isConnectedToNetwork()){
-            print("no connection")
-            connectionAlert(title: "Message", message: "Please make sure you have a working Internet Connection")
-        }
                 // if location service is disabled , show alert box with message
         let locationServiceAvailable =  Helper.checkLocationServiceState()
         if locationServiceAvailable == false {
             locationAlert(title: "Location Service is Disabled",message:"Please Enable Location Services to use Growthfile")
         }
+        
     }
 
     func applicationWillTerminate(_ application: UIApplication) {
@@ -122,16 +121,7 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
                                 willPresent notification: UNNotification,
                                 withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
         
-        if UIApplication.shared.applicationState == .active{
-            completionHandler([])
-        }
-        else {
-            completionHandler([.alert,.sound])
-        }
-        
         NotificationCenter.default.post(name:NSNotification.Name(rawValue: "fcmMessageReceived"),object:nil,userInfo:notification.request.content.userInfo)
-        
-        
     }
     
     /// Handle tap on the notification banner
@@ -142,10 +132,12 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
     func userNotificationCenter(_ center: UNUserNotificationCenter,
                                 didReceive response: UNNotificationResponse,
                                 withCompletionHandler completionHandler: @escaping () -> Void) {
+   
+
+    NotificationCenter.default.post(name:NSNotification.Name(rawValue: "fcmMessageReceived"),object:nil,userInfo:response.notification.request.content.userInfo)
         
-        let userInfo = response.notification.request.content.userInfo
-        completionHandler()
+        
+        completionHandler();
+
 }
-    
-    
 }

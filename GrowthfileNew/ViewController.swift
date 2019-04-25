@@ -7,18 +7,23 @@
 //
 
 
+
 import UIKit
 import WebKit
 import Foundation
 import Firebase
 import UserNotifications
 import CoreLocation
+import EventKit
 class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHandler,UIImagePickerControllerDelegate,UINavigationControllerDelegate,CLLocationManagerDelegate  {
     @IBOutlet  var webView: WKWebView!
+    var activityIndicator: UIActivityIndicatorView!
+
     var locationManager:CLLocationManager!
     var didFindLocation:Bool = false;
     weak var weakTimer: Timer?
-    
+    let eventStore : EKEventStore = EKEventStore()
+
     var refreshController : UIRefreshControl = UIRefreshControl()
      func openCamera(){
         if UIImagePickerController.isSourceTypeAvailable(UIImagePickerController.SourceType.camera){
@@ -26,14 +31,13 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
             imagePicker.delegate = self
             imagePicker.allowsEditing = true
             imagePicker.modalPresentationStyle = .popover
-            
             imagePicker.sourceType = UIImagePickerController.SourceType.camera
             self.present(imagePicker, animated: true, completion: nil)
         }
         else {
             print("no camera")
         }
-    }
+    };
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         if let pickedImage = info[UIImagePickerController.InfoKey.editedImage] as? UIImage,((info[UIImagePickerController.InfoKey.originalImage] as? UIImage) != nil)  {
@@ -47,7 +51,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
                     print ("success in sending base64 image to js")
                 }
                 else {
-                    print("error in sending base64 image to js" , error)
+                    print("error in sending base64 image to js" , error!)
                 }
             }
         }
@@ -87,7 +91,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
                 self.refreshController.endRefreshing()
             }
             else {
-                print(error)
+                print(error!)
             }
         })
 }
@@ -98,69 +102,47 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         let request:URLRequest;
       
         // Do any additional setup after loading the view, typically from a nib.
+        
         if Reachability.isConnectedToNetwork() {
-         
-            
-          request = URLRequest(url:URL(string:"https://growthfile-207204.firebaseapp.com")!)
+
+          request = URLRequest(url:URL(string:"https://growthfile-207204.firebaseapp.com/v1/")!)
             print("network avaiable")
         }
         else {
-            request = URLRequest(url:URL(string:"https://growthfile-207204.firebaseapp.com")!, cachePolicy:.returnCacheDataElseLoad)
+            request = URLRequest(url:URL(string:"https://growthfile-207204.firebaseapp.com/v1/")!, cachePolicy:.returnCacheDataElseLoad)
             print("network not available")
         }
-       
+
         NotificationCenter.default.addObserver(self, selector:#selector(foregroundRead), name: UIApplication.didBecomeActiveNotification, object: nil)
-      
+     
         NotificationCenter.default.addObserver(self, selector:#selector(retrieveUpdatedTokenFromNotificationDict(_:)), name: NSNotification.Name(rawValue:"RefreshedToken"),object:nil)
-        
-        NotificationCenter.default.addObserver(self, selector:#selector(callReadInJs), name: NSNotification.Name(rawValue: "fcmMessageReceived"), object: nil)
-
-        
+   
         webView.navigationDelegate = self
-        webView.load(request)
-
+        activityIndicator = UIActivityIndicatorView()
+        activityIndicator.center = self.view.center
+        activityIndicator.hidesWhenStopped = true
+        activityIndicator.style = UIActivityIndicatorView.Style.whiteLarge
+        activityIndicator.color = UIColor(displayP3Red: 3/255, green: 153/255, blue: 244/255, alpha: 255/255)
+        webView.addSubview(activityIndicator)
+        webView.load(request);
+        
     }
-    
+    func showActivityIndicator(show: Bool) {
+        if show {
+            activityIndicator.startAnimating()
+        } else {
+            activityIndicator.stopAnimating()
+        }
+    }
     @objc func foregroundRead(){
-        webView.evaluateJavaScript("runRead()", completionHandler: nil)
+        webView.evaluateJavaScript("runRead()", completionHandler: nil);
     }
-    
+
     @objc func callReadInJs(notification: NSNotification){
-       
-        let jsonObject: NSMutableDictionary = NSMutableDictionary()
-      
-        let runRead = notification.userInfo?["read"]
-        let verifyEmail = notification.userInfo?["verifyEmail"]
-        let removeOffice = notification.userInfo?["removedFromOffice"]
-        
-        if((runRead) != nil){
-            jsonObject.setValue(runRead, forKey: "read");
-        }
-        if((verifyEmail) != nil) {
-            jsonObject.setValue(verifyEmail, forKey: "verifyEmail")
-        }
-        if((removeOffice) != nil){
-            jsonObject.setValue(removeOffice, forKey: "removedFromOffice")
-        }
-        
-        let jsonData: NSData
-        do {
-            if(jsonObject.count > 0) {
-                
-            
-            jsonData = try JSONSerialization.data(withJSONObject: jsonObject, options: JSONSerialization.WritingOptions()) as NSData
-            
-            let jsonString = NSString(data: jsonData as Data, encoding: String.Encoding.utf8.rawValue)! as String
-            print(jsonString)
-            webView.evaluateJavaScript("runRead(\(jsonString))", completionHandler: nil)
-            }
-            else {
-                webView.evaluateJavaScript("runRead()", completionHandler: nil)
-            }
-        }
-        catch{
-         webView.evaluateJavaScript("runRead()", completionHandler: nil)
-        }
+        let jsonData = try? JSONSerialization.data(withJSONObject: notification.userInfo!,options: .prettyPrinted)
+        let jsonString = NSString(data: jsonData as! Data, encoding: String.Encoding.utf8.rawValue)! as String
+        print(jsonString);
+        webView.evaluateJavaScript("runRead(\(jsonString))", completionHandler: nil)
     }
     
     @objc func retrieveUpdatedTokenFromNotificationDict(_ notification :NSNotification){
@@ -177,7 +159,6 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
         locationManager.requestAlwaysAuthorization();
         locationManager.startUpdatingLocation();
-       
     }
   
     override func viewDidAppear(_ animated: Bool) {
@@ -185,7 +166,6 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         super.viewDidAppear(animated)
     }
     
-  
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         let userLocation:CLLocation = locations[0] as CLLocation
@@ -194,17 +174,13 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         jsonObject.setValue(userLocation.coordinate.latitude, forKey: "latitude");
         jsonObject.setValue(userLocation.coordinate.longitude, forKey: "longitude");
         jsonObject.setValue(userLocation.horizontalAccuracy, forKey: "accuracy");
-        jsonObject.setValue("Ios", forKey: "provider")
+        jsonObject.setValue("Ios", forKey: "provider");
 
         let jsonData: NSData
         do {
             if(didFindLocation == false && userLocation.horizontalAccuracy <= 350) {
-            print(userLocation.coordinate.latitude)
-            print(userLocation.coordinate.longitude);
-            print(userLocation.horizontalAccuracy);
             jsonData = try JSONSerialization.data(withJSONObject: jsonObject, options:JSONSerialization.WritingOptions()) as NSData
             let jsonString = NSString(data: jsonData as Data, encoding: String.Encoding.utf8.rawValue)! as String
-            print(jsonString)
             webView.evaluateJavaScript("updateLocationInRoot(\(jsonString))", completionHandler: nil);
             didFindLocation = true
         }
@@ -213,25 +189,43 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         }
     }
     
+    func webView(_ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+        let cred = URLCredential(trust: challenge.protectionSpace.serverTrust!)
+        completionHandler(.useCredential, cred)
+    }
+    
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error)
     {
        webView.evaluateJavaScript("iosLocationError(\(error.localizedDescription))", completionHandler: nil)
     }
     
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error : Error) {
-        print(error.localizedDescription)
+        
+        showToast(controller: self, message:error.localizedDescription, seconds: 5)
     }
     
     func webView(_ webView:WKWebView, didStartProvisionalNavigation navigation :WKNavigation!) {
+        showActivityIndicator(show: true)
+
         print("Start to load")
     }
     
     
     func webView(_ webView:WKWebView, didFinish navigation:WKNavigation!) {
-        print("webview has finished loading")
+        print("webview has finished loading");
+        showActivityIndicator(show: false)
+        
         let deviceInfo:String = Helper.generateDeviceIdentifier()
         print(deviceInfo);
-        webView.evaluateJavaScript("native.setName('Ios')", completionHandler: nil);
+        webView.evaluateJavaScript("native.setName('Ios')", completionHandler: {(result,error) in
+            if error == nil {
+                print("no error")
+            }
+            else {
+                print(" js execution error at ", error.debugDescription)
+            }
+        })
+            
         webView.evaluateJavaScript("native.setIosInfo('\(deviceInfo)')", completionHandler: {(result,error) in
             if error == nil {
                 print("no error")
@@ -240,6 +234,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
                 print(" js execution error at ", error as Any)
             }
         })
+    
         
         InstanceID.instanceID().instanceID(handler: { (result, error) in
             if let error = error {
@@ -251,11 +246,20 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
             }
         })
         
+        
+        NotificationCenter.default.addObserver(self, selector:#selector(callReadInJs), name: NSNotification.Name(rawValue: "fcmMessageReceived"), object: nil)
+
+        
         refreshController.bounds = CGRect.init(x: 0.0, y: 50.0, width: refreshController.bounds.size.width, height: refreshController.bounds.size.height)
         refreshController.addTarget(self, action: #selector(self.startPullToRef(refresh:)), for: .valueChanged)
         refreshController.attributedTitle = NSAttributedString(string: "Loading")
         webView.scrollView.addSubview(refreshController)
         
+        
+    }
+    func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+        showActivityIndicator(show: false)
+       showToast(controller: self, message: error.localizedDescription, seconds: 5)
     }
  
     func setFcmTokenToJsStorage(token:String){
@@ -268,8 +272,16 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
                 print("error occured at registering token from ios ", error as Any)
             }
         })
-        
     }
+    func showToast(controller: UIViewController, message : String, seconds: Double) {
+        let alert = UIAlertController(title: nil, message: message, preferredStyle: .alert)
+        alert.view.layer.cornerRadius = 15
+        controller.present(alert, animated: true)
+        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + seconds) {
+            alert.dismiss(animated: true)
+        }
+    }
+
   
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         print(message.name)
@@ -328,3 +340,14 @@ extension ViewController {
     }
    
 }
+extension Dictionary {
+    var jsonStringRepresentaiton: String? {
+        guard let theJSONData = try? JSONSerialization.data(withJSONObject: self,
+                                                            options: [.prettyPrinted]) else {
+                                                                return nil
+        }
+        
+        return String(data: theJSONData, encoding: .ascii)
+    }
+}
+
