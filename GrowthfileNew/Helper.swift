@@ -50,7 +50,7 @@ class Helper{
             return commonString+"&id="+stringResult
         }
         else {
-            
+             
             let uuid: String = KeyChainService.createUniqueID()
             let data = Data(from: uuid)
             KeyChainService.save(key: "growthfileNewKey", data: data)
@@ -59,8 +59,51 @@ class Helper{
     }
     
     static func convertImageDataToBase64(image:UIImage) -> Any {
-        let imgData:NSData  = image.jpegData(compressionQuality: 0.1)! as NSData
-        let imageBase64 = imgData.base64EncodedString(options:[])
-        return imageBase64
+        let resizedImage:UIImage = resizeImage(image: image);
+        guard let imageData = resizedImage.jpegData(compressionQuality:0.5) else {
+            return ""
+        }
+        return imageData.base64EncodedString()
+        
+    }
+    static func deviceWidth() -> CGFloat {
+        return UIScreen.main.bounds.width;
+    }
+    static func deviceHeight() -> CGFloat {
+        return UIScreen.main.bounds.height;
+    }
+    
+    static func resizeImage(image:UIImage) -> UIImage {
+        let size = image.size;
+     
+        let maxWidth = deviceWidth();
+        let maxHeight = deviceHeight();
+        let widthRatio = maxWidth / size.width;
+        let heightRatio = maxHeight / size.height;
+        let newSize:CGSize;
+        var outWidth = size.width;
+        var outHeight = size.height;
+        if(size.width > size.height) {
+            if(size.width > maxWidth) {
+                outWidth = maxWidth;
+                outHeight = (outHeight * maxWidth) / size.width
+            }
+        }
+        else {
+            if(size.height > maxHeight) {
+                outHeight = maxHeight;
+                outWidth = (outWidth * maxHeight) / size.height
+            }
+        }
+        newSize = CGSize(width: outWidth, height: outHeight)
+        let rect = CGRect(x:0,y:0,width: newSize.width,height:newSize.height);
+        UIGraphicsBeginImageContextWithOptions(newSize, false, 0.0)
+        image.draw(in: rect)
+        let newImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+      
+        return newImage!
+      
+
     }
 }
