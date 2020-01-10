@@ -16,13 +16,17 @@ import UserNotifications
 import CoreLocation
 import EventKit
 import ContactsUI
+import FacebookCore
+import FBSDKCoreKit
+
+
 class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHandler,UIImagePickerControllerDelegate,UINavigationControllerDelegate,CLLocationManagerDelegate,CNContactPickerDelegate  {
     @IBOutlet  var webView: WKWebView!
     var activityIndicator: UIActivityIndicatorView!
     var locationManager:CLLocationManager!
     var didFindLocation:Bool = false;
     var callbackName:String = "";
-    
+
 
     
      func openCamera(){
@@ -43,7 +47,6 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
             let base64Image:String = Helper.convertImageDataToBase64(image:pickedImage) as! String;
 
             let setFilePath = "\(callbackName)('\(base64Image)')"
-            
             webView.evaluateJavaScript(setFilePath) {(result,error) in
                 if error == nil {
                     print ("success in sending base64 image to js")
@@ -159,6 +162,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         userContentController.add(self,name:"checkInternet")
         userContentController.add(self,name:"locationService")
         userContentController.add(self,name:"getContact")
+        userContentController.add(self,name:"logEvent")
         configuration.userContentController = userContentController
         
         self.view.addSubview(webView)
@@ -178,10 +182,10 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         // Do any additional setup after loading the view, typically from a nib.
         
         if Reachability.isConnectedToNetwork() {
-            request = URLRequest(url:URL(string:"https://growthfilev2-0.firebaseapp.com/v1/")!, cachePolicy:.reloadRevalidatingCacheData)
+            request = URLRequest(url:URL(string:"https://growthfile-207204.firebaseapp.com/v2/")!, cachePolicy:.reloadRevalidatingCacheData)
         }
         else {
-            request = URLRequest(url:URL(string:"https://growthfilev2-0.firebaseapp.com/v1/")!, cachePolicy:.returnCacheDataElseLoad)
+            request = URLRequest(url:URL(string:"https://growthfile-207204.firebaseapp.com/v2/")!, cachePolicy:.returnCacheDataElseLoad)
         }
         
         activityIndicator = UIActivityIndicatorView()
@@ -212,7 +216,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
     }
     @objc func foregroundRead(){
       
-        webView.evaluateJavaScript("runRead()", completionHandler: nil);
+        webView.evaluateJavaScript("backgroundTransition()", completionHandler: nil);
     }
 
     @objc func callReadInJs(notification: NSNotification){
@@ -285,11 +289,49 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         print("Start to load")
     }
     
+    func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+        if webView != self.webView {
+            decisionHandler(.allow)
+            return
+        }
+        
+        let app  = UIApplication.shared;
+        if let url = navigationAction.request.url {
+            if url.scheme == "comgooglemaps://" || url.scheme?.starts(with: "comgooglemaps") ?? false {
+                if app.canOpenURL(url) {
+                    app.open(url, options: [:], completionHandler: nil)
+                    decisionHandler(.cancel);
+                    return
+                }
+                else {
+                    let queryItems = URLComponents(string: url.absoluteString)?.queryItems
+                    let ll = queryItems?.filter({$0.name == "center"}).first
+                    let appleMapScheme : String = "http://maps.apple.com/?ll=\(ll?.value ?? "")";
+                    let newUrl = NSURL(string: appleMapScheme)!;
+                    if app.canOpenURL(newUrl as URL) {
+                        app.open(newUrl as URL, options: [:], completionHandler: nil)
+                        decisionHandler(.cancel);
+                        return
+                    }
+                }
+            }
+           
+            if url.scheme == "tel" || url.scheme == "mailto" {
+                if app.canOpenURL(url){
+                    app.open(url, options: [:], completionHandler: nil)
+                     decisionHandler(.cancel);
+                    return;
+                }
+            
+                
+            }
+            decisionHandler(.allow)
+        }
+    }
     
     func webView(_ webView:WKWebView, didFinish navigation:WKNavigation!) {
         print("webview has finished loading");
         showActivityIndicator(show: false)
-        
         let deviceInfo:String = Helper.generateDeviceIdentifier()
         print(deviceInfo);
         webView.evaluateJavaScript("native.setName('Ios')", completionHandler: {(result,error) in
@@ -326,7 +368,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
     }
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
         showActivityIndicator(show: false)
-       showToast(controller: self, message: error.localizedDescription, seconds: 5)
+        showToast(controller: self, message: error.localizedDescription, seconds: 5)
     }
  
     func setFcmTokenToJsStorage(token:String){
@@ -399,6 +441,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
                 locationAlert(title: "Location Service is Disabled",message:"Please Enable Location Services to use Growthfile");
             }
         }
+        
         if message.name == "getContact" {
             callbackName = message.body as! String
             let contactPicker = CNContactPickerViewController();
@@ -407,6 +450,11 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
           
             self.present(contactPicker,animated: true,completion:nil);
             
+        }
+        if message.name == "logEvent" {
+            
+            AppEvents.logEvent(AppEvents.Name(message.body as! String))
+
         }
     
     }

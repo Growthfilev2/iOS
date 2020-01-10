@@ -5,5 +5,9 @@ use_frameworks!
 target 'GrowthfileNewApp' do
   pod 'Firebase/Core'
   pod 'Firebase/Messaging'
+  pod 'Firebase/DynamicLinks'
+  pod 'FacebookSDK'
+  pod 'FacebookCore'
+
 end
   

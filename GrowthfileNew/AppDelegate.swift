@@ -11,6 +11,11 @@ import WebKit
 import Firebase
 import FirebaseMessaging
 import UserNotifications
+import FBSDKCoreKit
+import FacebookCore
+
+
+
 
 @UIApplicationMain
 
@@ -21,12 +26,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
    
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
+        
         FirebaseApp.configure()
         registerForPushNotification(application: application)
- 
+        ApplicationDelegate.shared.application(application, didFinishLaunchingWithOptions: launchOptions)
         return true
     }
 
+    
+    func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
+        let handled = ApplicationDelegate.shared.application(app, open: url, options: options)
+
+        // Add any custom logic here.
+
+        return handled
+    }
    
     /** Register for receiveing push notifications **/
     
@@ -80,7 +94,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if locationServiceAvailable == false {
             locationAlert(title: "Location Service is Disabled",message:"Please Enable Location Services to use Growthfile")
         }
-     
+        
+        AppEvents.activateApp()
+        
+         
     }
 
     func applicationWillTerminate(_ application: UIApplication) {
