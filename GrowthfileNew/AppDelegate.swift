@@ -22,6 +22,7 @@ import FacebookCore
 class AppDelegate: UIResponder, UIApplicationDelegate {
     
     var window: UIWindow?
+    var deepLink: String?
     let gcmMessageIDKey = "gcm.message_id"
    
     
@@ -32,16 +33,54 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         ApplicationDelegate.shared.application(application, didFinishLaunchingWithOptions: launchOptions)
         return true
     }
+    
+    func application(_ application: UIApplication, continue userActivity: NSUserActivity,
+                      restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
+       let handled = DynamicLinks.dynamicLinks().handleUniversalLink(userActivity.webpageURL!) { (dynamiclink, error) in
+            if(dynamiclink != nil) {
+                self.deepLink =  dynamiclink?.url?.absoluteString;
+                let viewController = UIApplication.shared.windows.first!.rootViewController as! ViewController;
+                viewController.webView.evaluateJavaScript("parseDynamicLink('\(self.deepLink ?? "")')", completionHandler: {(result,error) in
+                    if error == nil {
+                        print("no error")
+                    }
+                    else {
+                        print("app open link : ",error.debugDescription)
+                    }
+                })
+                
+//                NotificationCenter.default.post(name: NSNotification.Name(rawValue: "passDynamicLink"), object: <#T##Any?#>, userInfo: <#T##[AnyHashable : Any]?#>)
+            }
+       }
+        
+       return handled
+     }
 
     
-    func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
-        let handled = ApplicationDelegate.shared.application(app, open: url, options: options)
+  @available(iOS 9.0, *)
+  func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any]) -> Bool {
+    return application(app, open: url,
+                       sourceApplication: options[UIApplication.OpenURLOptionsKey.sourceApplication] as? String,
+                       annotation: "")
+  }
 
-        // Add any custom logic here.
-
-        return handled
+  func application(_ application: UIApplication, open url: URL, sourceApplication: String?, annotation: Any) -> Bool {
+    if let dynamicLink = DynamicLinks.dynamicLinks().dynamicLink(fromCustomSchemeURL: url){
+      // Handle the deep link. For example, show the deep-linked content or
+      // apply a promotional offer to the user's account.
+      // ...
+        if(dynamicLink.url?.absoluteString != nil) {
+                 deepLink = dynamicLink.url?.absoluteString;
+        }
+       
+      return true
     }
+    return false
+  }
    
+ 
+    
+    
     /** Register for receiveing push notifications **/
     
     func registerForPushNotification(application: UIApplication){

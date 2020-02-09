@@ -17,6 +17,8 @@ PODS:
     - FBSDKCoreKit/Basics
   - FBSDKMarketingKit (5.11.1):
     - FBSDKCoreKit (~> 5.5)
+  - Firebase/Analytics (6.14.0):
+    - Firebase/Core
   - Firebase/Core (6.14.0):
     - Firebase/CoreOnly
     - FirebaseAnalytics (= 6.1.7)
@@ -104,6 +106,7 @@ PODS:
 DEPENDENCIES:
   - FacebookCore
   - FacebookSDK
+  - Firebase/Analytics
   - Firebase/Core
   - Firebase/DynamicLinks
   - Firebase/Messaging
@@ -151,6 +154,6 @@ SPEC CHECKSUMS:
   nanopb: 18003b5e52dab79db540fe93fe9579f399bd1ccd
   Protobuf: dd1aaea7140debfe4dd0683fb8ef208e527ae153
 
-PODFILE CHECKSUM: 84fa43063df0339c3d9a2b0461ba6483fee1fec4
+PODFILE CHECKSUM: d591d0d5b3cbf7739cb4c1522c06c43d8c95f6a4
 
 COCOAPODS: 1.5.3

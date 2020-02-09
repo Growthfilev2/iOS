@@ -21,6 +21,7 @@ import FBSDKCoreKit
 
 
 class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHandler,UIImagePickerControllerDelegate,UINavigationControllerDelegate,CLLocationManagerDelegate,CNContactPickerDelegate  {
+    
     @IBOutlet  var webView: WKWebView!
     var activityIndicator: UIActivityIndicatorView!
     var locationManager:CLLocationManager!
@@ -62,8 +63,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
     
     func contactPicker(_ picker: CNContactPickerViewController, didSelect contact: CNContact) {
         picker.dismiss(animated: true, completion: nil)
-
-      
+        
         let phoneNumberCount = contact.phoneNumbers.count;
         var name:String = contact.givenName;
         var phoneNumber:String = "";
@@ -203,6 +203,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         NotificationCenter.default.addObserver(self, selector:#selector(retrieveUpdatedTokenFromNotificationDict(_:)), name: NSNotification.Name(rawValue:"RefreshedToken"),object:nil);
         
         NotificationCenter.default.addObserver(self, selector:#selector(callReadInJs), name: NSNotification.Name(rawValue: "fcmMessageReceived"), object: nil);
+//        NotificationCenter.default.addObserver(self, selector: #selector(passDynamicLink), name: NSNotification.Name(rawValue: "passDynamicLink"), object: nil)
     }
     
 
@@ -218,7 +219,11 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
       
         webView.evaluateJavaScript("backgroundTransition()", completionHandler: nil);
     }
-
+    @objc func passDynamicLink() {
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate;
+        let deeplink = appDelegate.deepLink
+        webView.evaluateJavaScript("parseDynamicLink(\(deeplink ?? ""))", completionHandler: nil);
+    }
     @objc func callReadInJs(notification: NSNotification){
         let jsonData = try? JSONSerialization.data(withJSONObject: notification.userInfo!,options: .prettyPrinted)
         let jsonString = NSString(data: jsonData as! Data, encoding: String.Encoding.utf8.rawValue)! as String
@@ -334,6 +339,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         showActivityIndicator(show: false)
         let deviceInfo:String = Helper.generateDeviceIdentifier()
         print(deviceInfo);
+        
         webView.evaluateJavaScript("native.setName('Ios')", completionHandler: {(result,error) in
             if error == nil {
                 print("no error")
@@ -363,8 +369,20 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
             }
         })
         
-
-    
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate;
+        let deeplink = appDelegate.deepLink
+        if(deeplink != nil) {
+            webView.evaluateJavaScript("parseDynamicLink('\(deeplink ?? "")')", completionHandler: {
+                (result,error) in
+                if error == nil {
+                   print("passed link")
+                }
+                else {
+                     print("js execution error for deep link :  ", error.debugDescription)
+                }
+            });
+        }
+       
     }
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
         showActivityIndicator(show: false)
