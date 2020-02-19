@@ -18,6 +18,7 @@ import EventKit
 import ContactsUI
 import FacebookCore
 import FBSDKCoreKit
+import MessageUI
 
 
 class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHandler,UIImagePickerControllerDelegate,UINavigationControllerDelegate,CLLocationManagerDelegate,CNContactPickerDelegate  {
@@ -163,6 +164,8 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         userContentController.add(self,name:"locationService")
         userContentController.add(self,name:"getContact")
         userContentController.add(self,name:"logEvent")
+        userContentController.add(self,name:"share");
+        userContentController.add(self,name:"firebaseAnalytics")
         configuration.userContentController = userContentController
         
         self.view.addSubview(webView)
@@ -203,7 +206,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         NotificationCenter.default.addObserver(self, selector:#selector(retrieveUpdatedTokenFromNotificationDict(_:)), name: NSNotification.Name(rawValue:"RefreshedToken"),object:nil);
         
         NotificationCenter.default.addObserver(self, selector:#selector(callReadInJs), name: NSNotification.Name(rawValue: "fcmMessageReceived"), object: nil);
-//        NotificationCenter.default.addObserver(self, selector: #selector(passDynamicLink), name: NSNotification.Name(rawValue: "passDynamicLink"), object: nil)
+
     }
     
 
@@ -472,7 +475,82 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         if message.name == "logEvent" {
             
             AppEvents.logEvent(AppEvents.Name(message.body as! String))
-
+        }
+        
+        if message.name == "firebaseAnalytics" {
+            guard let body = message.body as? [String: Any] else { return }
+            guard let name = body["name"] as? String else { return }
+            guard let command = body["command"] as? String else { return }
+          
+           
+            if command == "logFirebaseAnlyticsEvent" {
+                guard let params = body["parameters"] as? [String: NSObject] else { return }
+                Analytics.logEvent(name, parameters: params)
+            }
+            if command == "setFirebaseAnalyticsUserProperty" {
+                guard let value = body["value"] as? String else { return }
+                Analytics.setUserProperty(value, forName: name)
+            }
+            
+            if command == "setFirebaseAnalyticsUserId" {
+                guard let id = body["id"] as? String else { return }
+                Analytics.setUserID(id)
+            }
+            if command == "setAnalyticsCollectionEnabled" {
+                guard let bool = body["enable"] as? Bool else { return }
+                Analytics.setAnalyticsCollectionEnabled(bool)
+            }
+        
+            
+        }
+ 
+        
+        if message.name == "share" {
+            if let messageBody:NSDictionary = message.body as? NSDictionary {
+                let link:String = messageBody["link"] as! String;
+                let shareText:String = messageBody["shareText"] as! String;
+             
+              
+                let activtyViewController = UIActivityViewController(activityItems: [shareText], applicationActivities: nil);
+                activtyViewController.popoverPresentationController?.sourceView = self.view;
+                activtyViewController.completionWithItemsHandler = { activity, success, items, error in
+                    if !success{
+                        print("cancelled")
+                        return
+                    }
+                    var appName:String = activity?.rawValue ?? "";
+                    if(activity == UIActivity.ActivityType.mail) {
+                            appName = "mail"
+                    }
+                    
+                    if(activity == UIActivity.ActivityType.message) {
+                         appName = "message"
+                        
+                    }
+                    if(activity == UIActivity.ActivityType.postToFacebook) {
+                         appName = "facebook"
+                       
+                   }
+                    if(activity == UIActivity.ActivityType.postToTwitter) {
+                         appName = "twitter"
+                    }
+                   
+                    if(activity == UIActivity.ActivityType.copyToPasteboard) {
+                        appName = "copy"
+                    }
+                    
+                self.webView.evaluateJavaScript("linkSharedComponent('\(appName)')", completionHandler: nil)
+                   
+                }
+            
+              
+                if let emailBody:NSDictionary = messageBody["email"] as? NSDictionary {
+            
+                    activtyViewController.setValue(emailBody["subject"], forKey: "subject")
+                }
+                
+                self.present(activtyViewController,animated: true,completion: nil);
+            }
         }
     
     }
