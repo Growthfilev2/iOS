@@ -15,28 +15,9 @@
                     <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <wkWebView contentMode="scaleToFill" allowsBackForwardNavigationGestures="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ehq-OS-BJw">
-                                <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
-                                <color key="backgroundColor" red="0.36078431370000003" green="0.38823529410000002" blue="0.4039215686" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                <wkWebViewConfiguration key="configuration" applicationNameForUserAgent="Growthfile">
-                                    <audiovisualMediaTypes key="mediaTypesRequiringUserActionForPlayback" none="YES"/>
-                                    <wkPreferences key="preferences"/>
-                                </wkWebViewConfiguration>
-                            </wkWebView>
-                        </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                        <constraints>
-                            <constraint firstItem="ehq-OS-BJw" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="7iA-g6-Nmf"/>
-                            <constraint firstItem="ehq-OS-BJw" firstAttribute="bottom" secondItem="6Tk-OE-BBY" secondAttribute="bottom" id="TZZ-Lx-qBq"/>
-                            <constraint firstItem="ehq-OS-BJw" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="gAV-DL-ERF"/>
-                            <constraint firstItem="ehq-OS-BJw" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="rWu-Cv-eJH"/>
-                        </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
-                    <connections>
-                        <outlet property="webView" destination="ehq-OS-BJw" id="LKK-u2-s3X"/>
-                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>

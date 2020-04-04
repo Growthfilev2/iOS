@@ -22,8 +22,10 @@ import MessageUI
 
 
 class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHandler,UIImagePickerControllerDelegate,UINavigationControllerDelegate,CLLocationManagerDelegate,CNContactPickerDelegate  {
-    
-    @IBOutlet  var webView: WKWebView!
+    var webView = WKWebView(frame: .zero)
+
+
+//    @IBOutlet  var webView: WKWebView(frame: .zero)
     @IBOutlet weak var myTopBar: UIView!
 
 
@@ -171,8 +173,8 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         userContentController.add(self,name:"firebaseAnalytics")
         configuration.userContentController = userContentController
         
-        self.view.addSubview(webView)
-        self.view.sendSubviewToBack(webView)
+//        self.view.addSubview(webView)
+//        self.view.sendSubviewToBack(webView)
        
         webView = WKWebView(frame:self.view.frame , configuration: configuration)
         
@@ -184,6 +186,22 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
     override func viewDidLoad() {
         super.viewDidLoad()
         print("view will load")
+        
+        webView.translatesAutoresizingMaskIntoConstraints = false
+        self.view.addSubview(self.webView)
+        // You can set constant space for Left, Right, Top and Bottom Anchors
+        NSLayoutConstraint.activate([
+            self.webView.leftAnchor.constraint(equalTo: self.view.leftAnchor),
+            self.webView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor),
+            self.webView.rightAnchor.constraint(equalTo: self.view.rightAnchor),
+            self.webView.topAnchor.constraint(equalTo: self.view.topAnchor),
+        ])
+        // For constant height use the below constraint and set your height constant and remove either top or bottom constraint
+        //self.webView.heightAnchor.constraint(equalToConstant: 200.0),
+        
+        self.view.setNeedsLayout()
+        
+    
         let request:URLRequest;
       
         // Do any additional setup after loading the view, typically from a nib.
@@ -199,9 +217,13 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         activityIndicator.center = self.view.center
         activityIndicator.hidesWhenStopped = true
         activityIndicator.style = UIActivityIndicatorView.Style.whiteLarge
-        activityIndicator.color = UIColor(displayP3Red: 3/255, green: 153/255, blue: 244/255, alpha: 255/255)
-        webView.addSubview(activityIndicator)
-        webView.navigationDelegate = self
+        if #available(iOS 10.0, *) {
+            activityIndicator.color = UIColor(displayP3Red: 3/255, green: 153/255, blue: 244/255, alpha: 255/255)
+        } else {
+            // Fallback on earlier versions
+        }
+//        webView.addSubview(activityIndicator)
+//        webView.navigationDelegate = self
 
         webView.load(request);
         
@@ -307,7 +329,11 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         if let url = navigationAction.request.url {
             if url.scheme == "comgooglemaps://" || url.scheme?.starts(with: "comgooglemaps") ?? false {
                 if app.canOpenURL(url) {
-                    app.open(url, options: [:], completionHandler: nil)
+                    if #available(iOS 10.0, *) {
+                        app.open(url, options: [:], completionHandler: nil)
+                    } else {
+                        // Fallback on earlier versions
+                    }
                     decisionHandler(.cancel);
                     return
                 }
@@ -317,7 +343,11 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
                     let appleMapScheme : String = "http://maps.apple.com/?ll=\(ll?.value ?? "")";
                     let newUrl = NSURL(string: appleMapScheme)!;
                     if app.canOpenURL(newUrl as URL) {
-                        app.open(newUrl as URL, options: [:], completionHandler: nil)
+                        if #available(iOS 10.0, *) {
+                            app.open(newUrl as URL, options: [:], completionHandler: nil)
+                        } else {
+                            // Fallback on earlier versions
+                        }
                         decisionHandler(.cancel);
                         return
                     }
@@ -326,7 +356,11 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
            
             if url.scheme == "tel" || url.scheme == "mailto" {
                 if app.canOpenURL(url){
-                    app.open(url, options: [:], completionHandler: nil)
+                    if #available(iOS 10.0, *) {
+                        app.open(url, options: [:], completionHandler: nil)
+                    } else {
+                        // Fallback on earlier versions
+                    }
                      decisionHandler(.cancel);
                     return;
                 }
@@ -458,7 +492,11 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
             let alert = UIAlertController(title: "Message", message: "There is a New version of your app available", preferredStyle: UIAlertController.Style.alert)
             
             alert.addAction(UIAlertAction(title: "Update", style: UIAlertAction.Style.default, handler: {( alert : UIAlertAction!) in
-                UIApplication.shared.open((URL(string: "itms-apps://itunes.apple.com/app/1441388774")!), options:[:], completionHandler: nil)
+                if #available(iOS 10.0, *) {
+                    UIApplication.shared.open((URL(string: "itms-apps://itunes.apple.com/app/1441388774")!), options:[:], completionHandler: nil)
+                } else {
+                    // Fallback on earlier versions
+                }
             }))
             self.present(alert, animated: true, completion: nil)
         }
@@ -598,7 +636,11 @@ extension ViewController {
     func locationAlert(title:String,message:String) -> Void {
         let alert = UIAlertController(title: title, message: message, preferredStyle: UIAlertController.Style.alert)
         alert.addAction(UIAlertAction(title: "Go To Settings", style: UIAlertAction.Style.default, handler: {( alert : UIAlertAction!) in
-            UIApplication.shared.open(NSURL(string:UIApplication.openSettingsURLString)! as URL, options:[:],completionHandler: nil)
+            if #available(iOS 10.0, *) {
+                UIApplication.shared.open(NSURL(string:UIApplication.openSettingsURLString)! as URL, options:[:],completionHandler: nil)
+            } else {
+                // Fallback on earlier versions
+            }
         }));
         
         self.present(alert, animated: true, completion: nil)
