@@ -17,6 +17,7 @@ import FacebookCore
 
 
 
+
 @UIApplicationMain
 
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -34,10 +35,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return true
     }
     
+    
     func application(_ application: UIApplication, continue userActivity: NSUserActivity,
                       restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
        let handled = DynamicLinks.dynamicLinks().handleUniversalLink(userActivity.webpageURL!) { (dynamiclink, error) in
             if(dynamiclink != nil) {
+                
                 self.deepLink =  dynamiclink?.url?.absoluteString;
                 let viewController = UIApplication.shared.windows.first!.rootViewController as! ViewController;
                 viewController.webView.evaluateJavaScript("parseDynamicLink('\(self.deepLink ?? "")')", completionHandler: {(result,error) in
@@ -48,23 +51,27 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                         print("app open link : ",error.debugDescription)
                     }
                 })
-                
-//                NotificationCenter.default.post(name: NSNotification.Name(rawValue: "passDynamicLink"), object: <#T##Any?#>, userInfo: <#T##[AnyHashable : Any]?#>)
+   
             }
        }
         
        return handled
      }
 
+ 
     
   @available(iOS 9.0, *)
   func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any]) -> Bool {
+    if(url.absoluteString.hasPrefix("growthfile://")) {
+          print("fb app link",url.absoluteString);
+    }
     return application(app, open: url,
                        sourceApplication: options[UIApplication.OpenURLOptionsKey.sourceApplication] as? String,
                        annotation: "")
   }
 
   func application(_ application: UIApplication, open url: URL, sourceApplication: String?, annotation: Any) -> Bool {
+    
     if let dynamicLink = DynamicLinks.dynamicLinks().dynamicLink(fromCustomSchemeURL: url){
       // Handle the deep link. For example, show the deep-linked content or
       // apply a promotional offer to the user's account.
@@ -75,6 +82,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
        
       return true
     }
+  
     return false
   }
    
@@ -160,6 +168,7 @@ extension UIApplicationDelegate  {
         self.window??.rootViewController?.present(alert, animated: true, completion: nil)
     }
 }
+
 extension MessagingDelegate {
     func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String) {
         print("Firebase registration token: \(fcmToken)")

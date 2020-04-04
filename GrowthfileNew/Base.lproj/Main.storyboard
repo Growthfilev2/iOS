@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
-    <device id="retina5_5" orientation="portrait">
-        <adaptation id="fullscreen"/>
-    </device>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="15705" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+    <device id="retina5_5" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14460.20"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15706"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -19,7 +17,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <wkWebView contentMode="scaleToFill" allowsBackForwardNavigationGestures="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ehq-OS-BJw">
-                                <rect key="frame" x="0.0" y="20" width="414" height="716"/>
+                                <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
                                 <color key="backgroundColor" red="0.36078431370000003" green="0.38823529410000002" blue="0.4039215686" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <wkWebViewConfiguration key="configuration" applicationNameForUserAgent="Growthfile">
                                     <audiovisualMediaTypes key="mediaTypesRequiringUserActionForPlayback" none="YES"/>
@@ -29,20 +27,10 @@
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
-                            <constraint firstItem="ehq-OS-BJw" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="7TR-Yr-bS2"/>
-                            <constraint firstItem="ehq-OS-BJw" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="CVx-uw-KGF"/>
-                            <constraint firstItem="ehq-OS-BJw" firstAttribute="trailing" secondItem="6Tk-OE-BBY" secondAttribute="trailing" id="Cp9-88-Joe"/>
-                            <constraint firstItem="ehq-OS-BJw" firstAttribute="bottom" secondItem="6Tk-OE-BBY" secondAttribute="bottom" id="Ssu-oc-BaH"/>
-                            <constraint firstItem="ehq-OS-BJw" firstAttribute="trailing" secondItem="6Tk-OE-BBY" secondAttribute="trailing" id="Vr7-mN-mta"/>
-                            <constraint firstItem="ehq-OS-BJw" firstAttribute="bottom" secondItem="6Tk-OE-BBY" secondAttribute="bottom" id="W6X-pN-A8k"/>
-                            <constraint firstItem="ehq-OS-BJw" firstAttribute="bottom" secondItem="6Tk-OE-BBY" secondAttribute="bottom" id="WRn-gp-fUe"/>
-                            <constraint firstItem="ehq-OS-BJw" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="WuO-s5-vfV"/>
-                            <constraint firstItem="ehq-OS-BJw" firstAttribute="trailing" secondItem="6Tk-OE-BBY" secondAttribute="trailing" id="dwM-Lb-Rmw"/>
-                            <constraint firstItem="ehq-OS-BJw" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="eSD-U7-uNy"/>
-                            <constraint firstItem="ehq-OS-BJw" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="ezl-AP-akB"/>
-                            <constraint firstItem="ehq-OS-BJw" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="gM8-oL-uTv"/>
-                            <constraint firstItem="ehq-OS-BJw" firstAttribute="trailing" secondItem="6Tk-OE-BBY" secondAttribute="trailing" id="wKG-Ti-kzH"/>
-                            <constraint firstItem="ehq-OS-BJw" firstAttribute="bottom" secondItem="6Tk-OE-BBY" secondAttribute="bottom" id="wmT-uO-KfM"/>
+                            <constraint firstItem="ehq-OS-BJw" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="7iA-g6-Nmf"/>
+                            <constraint firstItem="ehq-OS-BJw" firstAttribute="bottom" secondItem="6Tk-OE-BBY" secondAttribute="bottom" id="TZZ-Lx-qBq"/>
+                            <constraint firstItem="ehq-OS-BJw" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="gAV-DL-ERF"/>
+                            <constraint firstItem="ehq-OS-BJw" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="rWu-Cv-eJH"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>

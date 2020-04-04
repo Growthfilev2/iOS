@@ -24,11 +24,14 @@ import MessageUI
 class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHandler,UIImagePickerControllerDelegate,UINavigationControllerDelegate,CLLocationManagerDelegate,CNContactPickerDelegate  {
     
     @IBOutlet  var webView: WKWebView!
+    @IBOutlet weak var myTopBar: UIView!
+
+
     var activityIndicator: UIActivityIndicatorView!
     var locationManager:CLLocationManager!
     var didFindLocation:Bool = false;
     var callbackName:String = "";
-
+    var facebookLink:String = "";
 
     
      func openCamera(){
@@ -170,7 +173,8 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         
         self.view.addSubview(webView)
         self.view.sendSubviewToBack(webView)
-        webView = WKWebView(frame: view.frame, configuration: configuration)
+       
+        webView = WKWebView(frame:self.view.frame , configuration: configuration)
         
         view = webView
     }
@@ -185,10 +189,10 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         // Do any additional setup after loading the view, typically from a nib.
         
         if Reachability.isConnectedToNetwork() {
-            request = URLRequest(url:URL(string:"https://growthfile-207204.firebaseapp.com/v2/")!, cachePolicy:.reloadRevalidatingCacheData)
+            request = URLRequest(url:URL(string:"https://growthfilev2-0.firebaseapp.com/v2/")!, cachePolicy:.reloadRevalidatingCacheData)
         }
         else {
-            request = URLRequest(url:URL(string:"https://growthfile-207204.firebaseapp.com/v2/")!, cachePolicy:.returnCacheDataElseLoad)
+            request = URLRequest(url:URL(string:"https://growthfilev2-0.firebaseapp.com/v2/")!, cachePolicy:.returnCacheDataElseLoad)
         }
         
         activityIndicator = UIActivityIndicatorView()
@@ -222,11 +226,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
       
         webView.evaluateJavaScript("backgroundTransition()", completionHandler: nil);
     }
-    @objc func passDynamicLink() {
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate;
-        let deeplink = appDelegate.deepLink
-        webView.evaluateJavaScript("parseDynamicLink(\(deeplink ?? ""))", completionHandler: nil);
-    }
+ 
     @objc func callReadInJs(notification: NSNotification){
         let jsonData = try? JSONSerialization.data(withJSONObject: notification.userInfo!,options: .prettyPrinted)
         let jsonString = NSString(data: jsonData as! Data, encoding: String.Encoding.utf8.rawValue)! as String
@@ -385,6 +385,18 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
                 }
             });
         }
+        
+        if(!facebookLink.isEmpty) {
+            webView.evaluateJavaScript("parseFacebookDeeplink('\(facebookLink )')", completionHandler: {
+                           (result,error) in
+                           if error == nil {
+                              print("passed link")
+                           }
+                           else {
+                                print("js execution error for deep link :  ", error.debugDescription)
+                           }
+                       });
+        }
        
     }
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
@@ -413,6 +425,24 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
     }
     
     
+    
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
+            AppLinkUtility.fetchDeferredAppLink { (url, error) in
+                if let error = error {
+                    print("Received error while fetching deferred app link %@", error)
+                }
+                if let url = url {
+                
+                    self.facebookLink = url.absoluteString;
+                    if #available(iOS 10, *) {
+                        UIApplication.shared.open(url, options: [:], completionHandler: nil)
+                    } else {
+                        UIApplication.shared.openURL(url)
+                    }
+                }
+            }
+            return true;
+    }
 
   
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
@@ -542,8 +572,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
                 self.webView.evaluateJavaScript("linkSharedComponent('\(appName)')", completionHandler: nil)
                    
                 }
-            
-              
+                
                 if let emailBody:NSDictionary = messageBody["email"] as? NSDictionary {
             
                     activtyViewController.setValue(emailBody["subject"], forKey: "subject")

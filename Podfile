@@ -9,6 +9,5 @@ target 'GrowthfileNewApp' do
   pod 'Firebase/DynamicLinks'
   pod 'FacebookSDK'
   pod 'FacebookCore'
-
 end
   
