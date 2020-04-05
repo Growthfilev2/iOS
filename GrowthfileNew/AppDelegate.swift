@@ -33,13 +33,13 @@
                     print("Received error while fetching deferred app link %@", error)
                 }
                 if let url = url {
+                    self.facebookLink = url.absoluteString;
                     
-                    
-                    if #available(iOS 10, *) {
-                        UIApplication.shared.open(url, options: [:], completionHandler: nil)
-                    } else {
-                        UIApplication.shared.openURL(url)
-                    }
+                    //                    if #available(iOS 10, *) {
+                    //                        UIApplication.shared.open(url, options: [:], completionHandler: nil)
+                    //                    } else {
+                    //                        UIApplication.shared.openURL(url)
+                    //                    }
                 }
             }
             
@@ -78,19 +78,29 @@
         
         @available(iOS 9.0, *)
         func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any]) -> Bool {
-            if(url.absoluteString.hasPrefix("growthfile://")) {
-                print(url.absoluteString);
-                
-                let viewController = UIApplication.shared.windows.first!.rootViewController as! ViewController;
-                self.facebookLink = url.absoluteString;
-            }
+            
             return application(app, open: url,
                                sourceApplication: options[UIApplication.OpenURLOptionsKey.sourceApplication] as? String,
                                annotation: "")
         }
         
         func application(_ application: UIApplication, open url: URL, sourceApplication: String?, annotation: Any) -> Bool {
-            
+            if(url.absoluteString.hasPrefix("growthfile://")) {
+                
+                
+                let viewController = UIApplication.shared.windows.first!.rootViewController as! ViewController;
+                self.facebookLink = url.absoluteString;
+                viewController.webView.evaluateJavaScript("parseFacebookDeeplink('\(self.facebookLink ?? "")')", completionHandler: {(result,error) in
+                    if error == nil {
+                        print("no error")
+                    }
+                    else {
+                        print("app open link : ",error.debugDescription)
+                    }
+                })
+                
+                return true
+            }
             
             
             if let dynamicLink = DynamicLinks.dynamicLinks().dynamicLink(fromCustomSchemeURL: url){

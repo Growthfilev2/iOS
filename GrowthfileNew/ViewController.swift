@@ -22,10 +22,8 @@ import MessageUI
 
 
 class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHandler,UIImagePickerControllerDelegate,UINavigationControllerDelegate,CLLocationManagerDelegate,CNContactPickerDelegate  {
-    var webView = WKWebView(frame: .zero)
-
-
-//    @IBOutlet  var webView: WKWebView(frame: .zero)
+   
+    @IBOutlet  var webView: WKWebView!
     @IBOutlet weak var myTopBar: UIView!
 
 
@@ -33,7 +31,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
     var locationManager:CLLocationManager!
     var didFindLocation:Bool = false;
     var callbackName:String = "";
-    var facebookLink:String = "";
+
 
     
      func openCamera(){
@@ -407,9 +405,11 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         })
         
         let appDelegate = UIApplication.shared.delegate as! AppDelegate;
-        let deeplink = appDelegate.deepLink
-        if(deeplink != nil) {
-            webView.evaluateJavaScript("parseDynamicLink('\(deeplink ?? "")')", completionHandler: {
+        let deepLink = appDelegate.deepLink
+        let facebookLink = appDelegate.facebookLink;
+        
+        if(deepLink != nil) {
+            webView.evaluateJavaScript("parseDynamicLink('\(deepLink ?? "")')", completionHandler: {
                 (result,error) in
                 if error == nil {
                    print("passed link")
@@ -420,8 +420,8 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
             });
         }
         
-        if(!facebookLink.isEmpty) {
-            webView.evaluateJavaScript("parseFacebookDeeplink('\(facebookLink )')", completionHandler: {
+        if(facebookLink != nil) {
+            webView.evaluateJavaScript("parseFacebookDeeplink('\(facebookLink ?? "")')", completionHandler: {
                            (result,error) in
                            if error == nil {
                               print("passed link")
@@ -458,25 +458,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         }
     }
     
-    
-    
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
-            AppLinkUtility.fetchDeferredAppLink { (url, error) in
-                if let error = error {
-                    print("Received error while fetching deferred app link %@", error)
-                }
-                if let url = url {
-                
-                    self.facebookLink = url.absoluteString;
-                    if #available(iOS 10, *) {
-                        UIApplication.shared.open(url, options: [:], completionHandler: nil)
-                    } else {
-                        UIApplication.shared.openURL(url)
-                    }
-                }
-            }
-            return true;
-    }
+ 
 
   
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
