@@ -78,7 +78,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         }
         
         if(phoneNumberCount == 0) {
-            self.simpleAlert(title: "No phone numbers found", message: "You have no phone numbers associated with this contact")
+            self.simpleAlert(title: "No phone numbers found", message: "No phone number found for this contact")
             return;
         };
         
