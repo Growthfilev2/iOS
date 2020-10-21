@@ -78,7 +78,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         }
         
         if(phoneNumberCount == 0) {
-            self.simpleAlert(title: "Missing info", message: "You have no phone numbers associated with this contact")
+            self.simpleAlert(title: "No phone numbers found", message: "You have no phone numbers associated with this contact")
             return;
         };
         
@@ -99,7 +99,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         }
         if(phoneNumberCount > 1) {
             
-            let multipleNumbersActionAlert = UIAlertController(title:"Which Contact To Choose",message: "This contact has multiple phone numbers, which one did you want use?",preferredStyle: UIAlertController.Style.alert)
+            let multipleNumbersActionAlert = UIAlertController(title:"Choose a contact number",message: "This contact has multiple phone numbers. Which one do you want to use?",preferredStyle: UIAlertController.Style.alert)
             for number in contact.phoneNumbers {
                 if let actualNumber = number.value as? CNPhoneNumber {
                     var label:String = number.label ?? "phone Number";
@@ -158,6 +158,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         
         let configuration = WKWebViewConfiguration()
         configuration.preferences = preferences
+        configuration.limitsNavigationsToAppBoundDomains = true;
         
         let userContentController = WKUserContentController()
 
@@ -175,7 +176,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
 //        self.view.sendSubviewToBack(webView)
        
         webView = WKWebView(frame:self.view.frame , configuration: configuration)
-        
+        webView.navigationDelegate = self
         view = webView
     }
     
@@ -186,7 +187,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         print("view will load")
         
         webView.translatesAutoresizingMaskIntoConstraints = false
-        self.view.addSubview(self.webView)
+//        self.view.addSubview(self.webView)
         // You can set constant space for Left, Right, Top and Bottom Anchors
         NSLayoutConstraint.activate([
             self.webView.leftAnchor.constraint(equalTo: self.view.leftAnchor),
@@ -205,16 +206,17 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         // Do any additional setup after loading the view, typically from a nib.
         
         if Reachability.isConnectedToNetwork() {
-            request = URLRequest(url:URL(string:"https://growthfilev2-0.firebaseapp.com/v2/")!, cachePolicy:.reloadRevalidatingCacheData)
+            request = URLRequest(url:URL(string:"https://growthfilev2-0.firebaseapp.com")!, cachePolicy:.reloadRevalidatingCacheData)
         }
         else {
-            request = URLRequest(url:URL(string:"https://growthfilev2-0.firebaseapp.com/v2/")!, cachePolicy:.returnCacheDataElseLoad)
+            request = URLRequest(url:URL(string:"https://growthfilev2-0.firebaseapp.com")!, cachePolicy:.returnCacheDataElseLoad)
         }
         
         activityIndicator = UIActivityIndicatorView()
         activityIndicator.center = self.view.center
         activityIndicator.hidesWhenStopped = true
-        activityIndicator.style = UIActivityIndicatorView.Style.whiteLarge
+        activityIndicator.style = UIActivityIndicatorView.Style.large
+        
         if #available(iOS 10.0, *) {
             activityIndicator.color = UIColor(displayP3Red: 3/255, green: 153/255, blue: 244/255, alpha: 255/255)
         } else {
@@ -252,7 +254,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         let jsonString = NSString(data: jsonData as! Data, encoding: String.Encoding.utf8.rawValue)! as String
         print(jsonString);
     
-        webView.evaluateJavaScript("try { runRead(\(jsonString))}catch(e){}", completionHandler: nil)
+        webView.evaluateJavaScript("try {navigator.serviceWorker.controller.postMessage({type:'read'})}catch(e){console.error(e)}", completionHandler: nil)
     }
     
     @objc func retrieveUpdatedTokenFromNotificationDict(_ notification :NSNotification){
@@ -471,7 +473,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         
         if message.name == "updateApp" {
             
-            let alert = UIAlertController(title: "Message", message: "There is a New version of your app available", preferredStyle: UIAlertController.Style.alert)
+            let alert = UIAlertController(title: "Message", message: "There’s a new version of OnDuty App available. Update now.", preferredStyle: UIAlertController.Style.alert)
             
             alert.addAction(UIAlertAction(title: "Update", style: UIAlertAction.Style.default, handler: {( alert : UIAlertAction!) in
                 if #available(iOS 10.0, *) {
@@ -509,7 +511,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
                 locationManager.startUpdatingLocation();
             }
             else {
-                locationAlert(title: "Location Service is Disabled",message:"Please Enable Location Services to use Growthfile");
+                locationAlert(title: "Location Services Disabled",message:"Please turn on Location to use OnDuty");
             }
         }
         
@@ -557,7 +559,6 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         
         if message.name == "share" {
             if let messageBody:NSDictionary = message.body as? NSDictionary {
-                let link:String = messageBody["link"] as! String;
                 let shareText:String = messageBody["shareText"] as! String;
              
               

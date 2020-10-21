@@ -170,7 +170,7 @@
         func applicationDidBecomeActive(_ application: UIApplication) {
             let locationServiceAvailable =  Helper.checkLocationServiceState()
             if locationServiceAvailable == false {
-                locationAlert(title: "Location Service is Disabled",message:"Please Enable Location Services to use Growthfile")
+                locationAlert(title: "Location Services Disabled",message:"Please turn on Location to use OnDuty")
             }
             
             AppEvents.activateApp()

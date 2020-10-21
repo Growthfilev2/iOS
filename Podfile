@@ -1,5 +1,5 @@
 # Uncomment the next line to define a global platform for your project
-platform :ios, '12.1'
+platform :ios, '14'
 use_frameworks!
 
 target 'GrowthfileNewApp' do
@@ -11,3 +11,10 @@ target 'GrowthfileNewApp' do
   pod 'FacebookCore'
 end
   
+post_install do |pi|
+    pi.pods_project.targets.each do |t|
+      t.build_configurations.each do |config|
+        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '14'
+      end
+    end
+end

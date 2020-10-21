@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "1130"
+   LastUpgradeVersion = "1100"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "A79B6258FAE0EEE3F55E03D2ADE1F491"
+               BlueprintIdentifier = "5D3DB1A00D62ADDD0E64415F3B21C501"
                BuildableName = "Pods_GrowthfileNewApp.framework"
                BlueprintName = "Pods-GrowthfileNewApp"
                ReferencedContainer = "container:Pods.xcodeproj">
