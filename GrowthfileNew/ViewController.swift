@@ -161,7 +161,6 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         configuration.limitsNavigationsToAppBoundDomains = true;
         
         let userContentController = WKUserContentController()
-
         userContentController.add(self,name:"startCamera")
         userContentController.add(self,name:"updateApp")
         userContentController.add(self,name:"checkInternet")
@@ -206,10 +205,10 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         // Do any additional setup after loading the view, typically from a nib.
         
         if Reachability.isConnectedToNetwork() {
-            request = URLRequest(url:URL(string:"https://growthfilev2-0.firebaseapp.com")!, cachePolicy:.reloadRevalidatingCacheData)
+            request = URLRequest(url:URL(string:"https://growthfile-207204.firebaseapp.com/v3/")!, cachePolicy:.reloadRevalidatingCacheData)
         }
         else {
-            request = URLRequest(url:URL(string:"https://growthfilev2-0.firebaseapp.com")!, cachePolicy:.returnCacheDataElseLoad)
+            request = URLRequest(url:URL(string:"https://growthfile-207204.firebaseapp.com/v3/")!, cachePolicy:.returnCacheDataElseLoad)
         }
         
         activityIndicator = UIActivityIndicatorView()
@@ -377,7 +376,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         let deviceInfo:String = Helper.generateDeviceIdentifier()
         print(deviceInfo);
         
-        webView.evaluateJavaScript("native.setName('Ios')", completionHandler: {(result,error) in
+        webView.evaluateJavaScript("_native.setName('Ios')", completionHandler: {(result,error) in
             if error == nil {
                 print("no error")
             }
@@ -386,7 +385,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
             }
         })
             
-        webView.evaluateJavaScript("native.setIosInfo('\(deviceInfo)')", completionHandler: {(result,error) in
+        webView.evaluateJavaScript("_native.setIosInfo('\(deviceInfo)')", completionHandler: {(result,error) in
             if error == nil {
                 print("no error")
             }
@@ -442,7 +441,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
  
     func setFcmTokenToJsStorage(token:String){
         
-        self.webView.evaluateJavaScript("native.setFCMToken('\(token)')", completionHandler: {(result,error) in
+        self.webView.evaluateJavaScript("_native.setFCMToken('\(token)')", completionHandler: {(result,error) in
             if error == nil {
                 print("no error whilst regiesteriton token")
             }
