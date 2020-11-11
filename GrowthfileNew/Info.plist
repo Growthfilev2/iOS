@@ -112,7 +112,7 @@
 	</array>
 	<key>WKAppBoundDomains</key>
 	<array>
-		<string>growthfilev2-0.firebaseapp.com</string>
+		<string>app.growthfile.com</string>
 	</array>
 </dict>
 </plist>

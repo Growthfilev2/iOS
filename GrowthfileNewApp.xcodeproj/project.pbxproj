@@ -16,9 +16,9 @@
 		352C2E22218DBC12004B694F /* GrowthfileNewUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 352C2E21218DBC12004B694F /* GrowthfileNewUITests.swift */; };
 		352C2E30218E94F5004B694F /* Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 352C2E2F218E94F5004B694F /* Helper.swift */; };
 		352C2E32218E9F16004B694F /* KeyChainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 352C2E31218E9F16004B694F /* KeyChainService.swift */; };
-		35A96685254C4B84000B9AC9 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 35A96684254C4B84000B9AC9 /* GoogleService-Info.plist */; };
 		35F23B6C21A6C0860013396F /* Reachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35F23B6B21A6C0860013396F /* Reachability.swift */; };
-		AFD6924849C8CEF53F344A7F /* Pods_GrowthfileNewApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9F55D3DC23411851986677D4 /* Pods_GrowthfileNewApp.framework */; };
+		35F82893254C837D009B83FA /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 35F82892254C837D009B83FA /* GoogleService-Info.plist */; };
+		D77C79690AE4F3E8A8B657AE /* Pods_GrowthfileNewApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D6C580817B262FFE84451B5B /* Pods_GrowthfileNewApp.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -55,11 +55,11 @@
 		352C2E23218DBC12004B694F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		352C2E2F218E94F5004B694F /* Helper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helper.swift; sourceTree = "<group>"; };
 		352C2E31218E9F16004B694F /* KeyChainService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyChainService.swift; sourceTree = "<group>"; };
-		35A96684254C4B84000B9AC9 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../../../../../Downloads/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		35F23B6B21A6C0860013396F /* Reachability.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Reachability.swift; sourceTree = "<group>"; };
-		3E978D00D47C97CA8E00CE76 /* Pods-GrowthfileNewApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GrowthfileNewApp.release.xcconfig"; path = "Target Support Files/Pods-GrowthfileNewApp/Pods-GrowthfileNewApp.release.xcconfig"; sourceTree = "<group>"; };
-		9F55D3DC23411851986677D4 /* Pods_GrowthfileNewApp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_GrowthfileNewApp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		CF5E059B61D5F26BDDC8443C /* Pods-GrowthfileNewApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GrowthfileNewApp.debug.xcconfig"; path = "Target Support Files/Pods-GrowthfileNewApp/Pods-GrowthfileNewApp.debug.xcconfig"; sourceTree = "<group>"; };
+		35F82892254C837D009B83FA /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		B32629941B238FAB68CC46FD /* Pods-GrowthfileNewApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GrowthfileNewApp.debug.xcconfig"; path = "Target Support Files/Pods-GrowthfileNewApp/Pods-GrowthfileNewApp.debug.xcconfig"; sourceTree = "<group>"; };
+		B369244F0E3D082457DDC5AA /* Pods-GrowthfileNewApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GrowthfileNewApp.release.xcconfig"; path = "Target Support Files/Pods-GrowthfileNewApp/Pods-GrowthfileNewApp.release.xcconfig"; sourceTree = "<group>"; };
+		D6C580817B262FFE84451B5B /* Pods_GrowthfileNewApp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_GrowthfileNewApp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -67,7 +67,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AFD6924849C8CEF53F344A7F /* Pods_GrowthfileNewApp.framework in Frameworks */,
+				D77C79690AE4F3E8A8B657AE /* Pods_GrowthfileNewApp.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -97,7 +97,7 @@
 				352C2E20218DBC12004B694F /* GrowthfileNewUITests */,
 				352C2DFF218DBC10004B694F /* Products */,
 				CAEA8A712A5F3172C45B178E /* Pods */,
-				35E23E1856335E8D1FAB1ED4 /* Frameworks */,
+				787FDECF0475045195AFA6FC /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -114,7 +114,7 @@
 		352C2E00218DBC10004B694F /* GrowthfileNew */ = {
 			isa = PBXGroup;
 			children = (
-				35A96684254C4B84000B9AC9 /* GoogleService-Info.plist */,
+				35F82892254C837D009B83FA /* GoogleService-Info.plist */,
 				352C2E01218DBC10004B694F /* AppDelegate.swift */,
 				352C2E03218DBC10004B694F /* ViewController.swift */,
 				352C2E05218DBC10004B694F /* Main.storyboard */,
@@ -146,10 +146,10 @@
 			path = GrowthfileNewUITests;
 			sourceTree = "<group>";
 		};
-		35E23E1856335E8D1FAB1ED4 /* Frameworks */ = {
+		787FDECF0475045195AFA6FC /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				9F55D3DC23411851986677D4 /* Pods_GrowthfileNewApp.framework */,
+				D6C580817B262FFE84451B5B /* Pods_GrowthfileNewApp.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -157,8 +157,8 @@
 		CAEA8A712A5F3172C45B178E /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				CF5E059B61D5F26BDDC8443C /* Pods-GrowthfileNewApp.debug.xcconfig */,
-				3E978D00D47C97CA8E00CE76 /* Pods-GrowthfileNewApp.release.xcconfig */,
+				B32629941B238FAB68CC46FD /* Pods-GrowthfileNewApp.debug.xcconfig */,
+				B369244F0E3D082457DDC5AA /* Pods-GrowthfileNewApp.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -170,11 +170,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 352C2E26218DBC12004B694F /* Build configuration list for PBXNativeTarget "GrowthfileNewApp" */;
 			buildPhases = (
-				3357DABED3F58DF94BA01139 /* [CP] Check Pods Manifest.lock */,
+				B5FA78359D7F1033AED3E08B /* [CP] Check Pods Manifest.lock */,
 				352C2DFA218DBC10004B694F /* Sources */,
 				352C2DFB218DBC10004B694F /* Frameworks */,
 				352C2DFC218DBC10004B694F /* Resources */,
-				0871701B77D25E7899648697 /* [CP] Embed Pods Frameworks */,
+				75D1F2BBC24B841430650ED6 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -281,8 +281,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				35A96685254C4B84000B9AC9 /* GoogleService-Info.plist in Resources */,
 				352C2E0C218DBC12004B694F /* LaunchScreen.storyboard in Resources */,
+				35F82893254C837D009B83FA /* GoogleService-Info.plist in Resources */,
 				352C2E09218DBC12004B694F /* Assets.xcassets in Resources */,
 				352C2E07218DBC10004B694F /* Main.storyboard in Resources */,
 			);
@@ -305,7 +305,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		0871701B77D25E7899648697 /* [CP] Embed Pods Frameworks */ = {
+		75D1F2BBC24B841430650ED6 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -322,7 +322,7 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-GrowthfileNewApp/Pods-GrowthfileNewApp-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		3357DABED3F58DF94BA01139 /* [CP] Check Pods Manifest.lock */ = {
+		B5FA78359D7F1033AED3E08B /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -530,14 +530,14 @@
 		};
 		352C2E27218DBC12004B694F /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = CF5E059B61D5F26BDDC8443C /* Pods-GrowthfileNewApp.debug.xcconfig */;
+			baseConfigurationReference = B32629941B238FAB68CC46FD /* Pods-GrowthfileNewApp.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = GrowthfileNewApp.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 27;
+				CURRENT_PROJECT_VERSION = 29;
 				DEVELOPMENT_TEAM = SAAX8C4X6E;
 				ENABLE_BITCODE = YES;
 				GCC_NO_COMMON_BLOCKS = NO;
@@ -547,7 +547,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1.20;
+				MARKETING_VERSION = 1.1.22;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-l\"c++\"",
@@ -634,14 +634,14 @@
 		};
 		352C2E28218DBC12004B694F /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 3E978D00D47C97CA8E00CE76 /* Pods-GrowthfileNewApp.release.xcconfig */;
+			baseConfigurationReference = B369244F0E3D082457DDC5AA /* Pods-GrowthfileNewApp.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = GrowthfileNewApp.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 27;
+				CURRENT_PROJECT_VERSION = 29;
 				DEVELOPMENT_TEAM = SAAX8C4X6E;
 				ENABLE_BITCODE = YES;
 				GCC_NO_COMMON_BLOCKS = NO;
@@ -651,7 +651,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1.20;
+				MARKETING_VERSION = 1.1.22;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-l\"c++\"",

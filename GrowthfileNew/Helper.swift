@@ -40,7 +40,7 @@ class Helper{
         let model = UIDevice.current.model
         let brand : String = "apple"
         let baseOs = "ios"
-        let appVersion = "11"
+        let appVersion = "12"
         let commonString =  "baseOs="+baseOs+"&deviceBrand="+brand+"&deviceModel="+model+"&appVersion="+appVersion+"&osVersion="+systemName;
         
         if let receivedData = KeyChainService.load(key: "growthfileNewKey") {

@@ -48,9 +48,8 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
 
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         if let pickedImage = info[.originalImage] as? UIImage {
-            
-            let base64Image:String = Helper.convertImageDataToBase64(image:pickedImage) as! String;
 
+            let base64Image:String = Helper.convertImageDataToBase64(image:pickedImage) as! String;
             let setFilePath = "\(callbackName)('\(base64Image)')"
             webView.evaluateJavaScript(setFilePath) {(result,error) in
                 if error == nil {
@@ -205,10 +204,10 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         // Do any additional setup after loading the view, typically from a nib.
         
         if Reachability.isConnectedToNetwork() {
-            request = URLRequest(url:URL(string:"https://growthfile-207204.firebaseapp.com/v3/")!, cachePolicy:.reloadRevalidatingCacheData)
+            request = URLRequest(url:URL(string:"https://app.growthfile.com")!, cachePolicy:.reloadRevalidatingCacheData)
         }
         else {
-            request = URLRequest(url:URL(string:"https://growthfile-207204.firebaseapp.com/v3/")!, cachePolicy:.returnCacheDataElseLoad)
+            request = URLRequest(url:URL(string:"https://app.growthfile.com")!, cachePolicy:.returnCacheDataElseLoad)
         }
         
         activityIndicator = UIActivityIndicatorView()
