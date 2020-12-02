@@ -112,7 +112,9 @@
 	</array>
 	<key>WKAppBoundDomains</key>
 	<array>
+		<string>growthfile.com</string>
 		<string>app.growthfile.com</string>
+		<string>growthfile.page.link</string>
 	</array>
 </dict>
 </plist>

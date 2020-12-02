@@ -307,7 +307,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
     }
     
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error : Error) {
-        
+        print(error)
         showToast(controller: self, message:error.localizedDescription, seconds: 5)
     }
     
@@ -409,7 +409,8 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         let facebookLink = appDelegate.facebookLink;
         
         if(deepLink != nil) {
-            webView.evaluateJavaScript("parseDynamicLink('\(deepLink ?? "")')", completionHandler: {
+            
+            webView.evaluateJavaScript("getDynamicLink('\(deepLink ?? "")')", completionHandler: {
                 (result,error) in
                 if error == nil {
                    print("passed link")

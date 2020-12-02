@@ -58,8 +58,9 @@
                     
                     self.deepLink =  dynamiclink?.url?.absoluteString;
                     let viewController = UIApplication.shared.windows.first!.rootViewController as! ViewController;
-                    
-                    viewController.webView.evaluateJavaScript("parseDynamicLink('\(self.deepLink ?? "")')", completionHandler: {(result,error) in
+                   
+                    print("deep link: "+self.deepLink! ?? "");
+                    viewController.webView.evaluateJavaScript("getDynamicLink('\(self.deepLink ?? "")')", completionHandler: {(result,error) in
                         if error == nil {
                             print("no error")
                         }
