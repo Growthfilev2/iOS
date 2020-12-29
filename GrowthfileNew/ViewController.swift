@@ -36,8 +36,8 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
     
     var captureSession = AVCaptureSession()
     var videoPreviewLayer:AVCaptureVideoPreviewLayer?
-    
-    
+    var previewView = UIView()
+    var isCameraFront = false
     private let supportedCodeTypes = [AVMetadataObject.ObjectType.upce,
                                       AVMetadataObject.ObjectType.code39,
                                       AVMetadataObject.ObjectType.code39Mod43,
@@ -52,57 +52,198 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
                                       AVMetadataObject.ObjectType.interleaved2of5,
                                       AVMetadataObject.ObjectType.qr]
     
-    func openCamera(){
-        let deviceDiscoverySession = AVCaptureDevice.default(.builtInWideAngleCamera, for: AVMediaType.video, position: .back)
-        guard let captureDevice = deviceDiscoverySession else {
-            print("Failed to get the camera device")
-            return
+    
+    func getCameraInput() -> AVCaptureDeviceInput? {
+        if getBackCameraInput() != nil {
+            return getBackCameraInput()
         }
+        if getFrontCameraInput() != nil {
+            return getFrontCameraInput()
+        }
+        return nil
+    }
+    
+    func setUpCamera(){
         do {
-            let input = try AVCaptureDeviceInput(device: captureDevice)
-            print("camera type",input.device)
-            
-            let inputs = captureSession.inputs
-            for input in inputs {
-                captureSession.removeInput(input)
+            guard let input = getCameraInput() else {
+                print("No camera found")
+                return
             }
             
+            print("camera type",input.device)
             
-            captureSession.addInput(input)
+            // add the camera input . Default input is back camera
+            addCameraInput(input: input)
             
+            // set the output. The output contains the live video feed
             let captureMetadataOutput = AVCaptureMetadataOutput()
+            // clear the existing outputs
             for output in captureSession.outputs {
                 captureSession.removeOutput(output)
             }
-            
+            // add the new output
             captureSession.addOutput(captureMetadataOutput)
             
             captureMetadataOutput.setMetadataObjectsDelegate(self, queue: DispatchQueue.main)
             captureMetadataOutput.metadataObjectTypes = supportedCodeTypes
             
+            previewView.frame = self.view.frame
+            view.addSubview(previewView)
             
-        } catch {
+            
+            self.view.addSubview(flipButton())
+            self.view.addSubview(closeButton())
+            self.view.addSubview(flashButton())
+            self.view.addSubview(torchButton())
+            self.view.addSubview(captureButton())
+            
+            DispatchQueue.global().async {
+                self.captureSession.startRunning()
+                DispatchQueue.main.async {
+                    self.videoPreviewLayer = AVCaptureVideoPreviewLayer(session: self.captureSession)
+                    self.videoPreviewLayer?.videoGravity = AVLayerVideoGravity.resizeAspectFill
+                    self.videoPreviewLayer?.frame = self.view.layer.bounds
+                    self.previewView.layer.addSublayer(self.videoPreviewLayer!)
+                    
+                }
+            }
+        }
+        catch {
             print(error)
+        }
+        
+        
+    }
+    
+    func addCameraInput(input:AVCaptureDeviceInput) {
+        let inputs = captureSession.inputs
+        captureSession.beginConfiguration()
+        
+        // clear all inputs
+        for input in inputs {
+            captureSession.removeInput(input)
+        }
+        
+        // add the device input
+        captureSession.addInput(input)
+        captureSession.commitConfiguration()
+        
+        
+        
+    }
+    
+    
+    @objc func flipCamera(){
+        guard let input = isCameraFront ? getBackCameraInput() : getFrontCameraInput() else {
+            print("Could not find specified camera")
             return
         }
-        videoPreviewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
-        videoPreviewLayer?.videoGravity = AVLayerVideoGravity.resizeAspectFill
-        videoPreviewLayer?.frame = view.layer.bounds
-        view.layer.addSublayer(videoPreviewLayer!)
+
+        isCameraFront = !isCameraFront
+        addCameraInput(input: input)
         
-        captureSession.startRunning()
-        //        webView.isHidden = true
-    };
+    }
+    
+    
+    
+    func getFrontCameraInput() -> AVCaptureDeviceInput? {
+        
+        guard let front =  AVCaptureDevice.default(.builtInWideAngleCamera, for: AVMediaType.video, position: .front) else {
+            return nil
+        }
+        
+        do {
+            let input = try AVCaptureDeviceInput(device: front)
+            return input
+        } catch{
+            print(error)
+            return nil
+        }
+        
+        
+    }
+    
+    func getBackCameraInput() -> AVCaptureDeviceInput? {
+        
+        guard let back =  AVCaptureDevice.default(.builtInWideAngleCamera, for: AVMediaType.video, position: .back)
+        else {
+            return nil
+        }
+        do {
+            let input = try AVCaptureDeviceInput(device: back)
+            return input
+        } catch{
+            print(error)
+            return nil
+        }
+    }
+    
+    func flipButton() -> UIButton{
+        let captureButton = UIButton(frame: CGRect(x: (self.view.frame.size.width - 100) / 2 , y: (self.view.frame.size.height - 100), width: 100, height: 100))
+        
+        let img = UIImage(named: "flip")?.withRenderingMode(.alwaysTemplate)
+        
+        captureButton.setImage(img, for: .normal)
+        captureButton.tintColor = UIColor.white
+        captureButton.addTarget(self, action: #selector(flipCamera), for: .touchUpInside)
+        return captureButton
+    }
+    
+    func torchButton() -> UIButton{
+        let captureButton = UIButton(frame: CGRect(x: (self.view.frame.size.width - 100) / 2 , y: (self.view.frame.size.height - 100), width: 100, height: 100))
+        
+        let img = UIImage(named: "flip")?.withRenderingMode(.alwaysTemplate)
+        
+        captureButton.setImage(img, for: .normal)
+        captureButton.tintColor = UIColor.white
+        captureButton.addTarget(self, action: #selector(flipCamera), for: .touchUpInside)
+        return captureButton
+    }
+    
+    func captureButton() -> UIButton{
+        let captureButton = UIButton(frame: CGRect(x: (self.view.frame.size.width - 100) / 2 , y: (self.view.frame.size.height - 100), width: 100, height: 100))
+        
+        let img = UIImage(named: "flip")?.withRenderingMode(.alwaysTemplate)
+        
+        captureButton.setImage(img, for: .normal)
+        captureButton.tintColor = UIColor.white
+        captureButton.addTarget(self, action: #selector(flipCamera), for: .touchUpInside)
+        return captureButton
+    }
+    
+    func flashButton() -> UIButton{
+        let captureButton = UIButton(frame: CGRect(x: (self.view.frame.size.width - 100) / 2 , y: (self.view.frame.size.height - 100), width: 100, height: 100))
+        
+        let img = UIImage(named: "flip")?.withRenderingMode(.alwaysTemplate)
+        
+        captureButton.setImage(img, for: .normal)
+        captureButton.tintColor = UIColor.white
+        captureButton.addTarget(self, action: #selector(flipCamera), for: .touchUpInside)
+        return captureButton
+    }
+    
+    func closeButton() -> UIButton{
+        let captureButton = UIButton(frame: CGRect(x: (self.view.frame.size.width - 100) / 2 , y: (self.view.frame.size.height - 100), width: 100, height: 100))
+        
+        let img = UIImage(named: "flip")?.withRenderingMode(.alwaysTemplate)
+        
+        captureButton.setImage(img, for: .normal)
+        captureButton.tintColor = UIColor.white
+        captureButton.addTarget(self, action: #selector(flipCamera), for: .touchUpInside)
+        return captureButton
+    }
+    
     
     func closeCamera() {
         captureSession.stopRunning()
-      
+        
         //        videoPreviewLayer?.session?.stopRunning()
+        previewView.removeFromSuperview()
         videoPreviewLayer?.removeFromSuperlayer()
-//        DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) { // Change `2.0` to the desired number of seconds.
-//            // Code you want to be delayed
-//            self.openCamera()
-//        }
+        //        DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) { // Change `2.0` to the desired number of seconds.
+        //            // Code you want to be delayed
+        //            self.openCamera()
+        //        }
         //        webView.isHidden = fal
         //        webView.isHidden = false
         //        videoPreviewLayer?.isHidden = true
@@ -314,11 +455,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         
         if #available(iOS 10.0, *) {
             activityIndicator.color = UIColor(displayP3Red: 3/255, green: 153/255, blue: 244/255, alpha: 255/255)
-        } else {
-            // Fallback on earlier versions
         }
-        //        webView.addSubview(activityIndicator)
-        //        webView.navigationDelegate = self
         
         webView.load(request);
         
@@ -327,6 +464,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         NotificationCenter.default.addObserver(self, selector:#selector(retrieveUpdatedTokenFromNotificationDict(_:)), name: NSNotification.Name(rawValue:"RefreshedToken"),object:nil);
         
         NotificationCenter.default.addObserver(self, selector:#selector(callReadInJs), name: NSNotification.Name(rawValue: "fcmMessageReceived"), object: nil);
+        setUpCamera()
         
     }
     
@@ -476,7 +614,6 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
             return
         }
         
-        openCamera();
         
         webView.evaluateJavaScript("_native.setName('Ios')", completionHandler: {(result,error) in
             if error == nil {
@@ -570,7 +707,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         
         if message.name == "startCamera" {
             callbackName = message.body as! String
-            openCamera()
+            //            openCamera(front:false)
         }
         
         if message.name == "updateApp" {
@@ -767,16 +904,21 @@ extension ViewController: AVCaptureMetadataOutputObjectsDelegate {
                 
                 print(metadataObj.stringValue ?? "No value")
                 if((metadataObj.stringValue?.starts(with: "https://")) != nil) {
-//                    closeCamera()
-                    let request:URLRequest;
+                    
+                    
+                    
+                    
+                    
+                    closeCamera()
+                    //                    let request:URLRequest;
                     
                     // Do any additional setup after loading the view, typically from a nib.
                     
-                    if Reachability.isConnectedToNetwork() {
-                        request = URLRequest(url:URL(string:metadataObj.stringValue!)!, cachePolicy:.reloadRevalidatingCacheData)
-                        closeCamera()
-                        webView.load(request)
-                    }
+                    //                    if Reachability.isConnectedToNetwork() {
+                    //                        request = URLRequest(url:URL(string:metadataObj.stringValue!)!, cachePolicy:.reloadRevalidatingCacheData)
+                    //                        closeCamera()
+                    //                        webView.load(request)
+                    //                    }
                     
                 }
                 
