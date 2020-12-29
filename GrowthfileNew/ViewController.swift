@@ -19,36 +19,133 @@ import ContactsUI
 import FacebookCore
 import FBSDKCoreKit
 import MessageUI
+import AVFoundation
 
 
 class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHandler,UIImagePickerControllerDelegate,UINavigationControllerDelegate,CLLocationManagerDelegate,CNContactPickerDelegate  {
-   
+    
     @IBOutlet  var webView: WKWebView!
     @IBOutlet weak var myTopBar: UIView!
-
-
+    
+    
     var activityIndicator: UIActivityIndicatorView!
     var locationManager:CLLocationManager!
     var didFindLocation:Bool = false;
     var callbackName:String = "";
-
-
     
-     func openCamera(){
-        if UIImagePickerController.isSourceTypeAvailable(UIImagePickerController.SourceType.camera){
-            let imagePicker = UIImagePickerController()
-            imagePicker.delegate = self
-            imagePicker.sourceType = UIImagePickerController.SourceType.camera
-            self.present(imagePicker, animated: true, completion: nil)
+    
+    var captureSession = AVCaptureSession()
+    var videoPreviewLayer:AVCaptureVideoPreviewLayer?
+    
+    
+    private let supportedCodeTypes = [AVMetadataObject.ObjectType.upce,
+                                      AVMetadataObject.ObjectType.code39,
+                                      AVMetadataObject.ObjectType.code39Mod43,
+                                      AVMetadataObject.ObjectType.code93,
+                                      AVMetadataObject.ObjectType.code128,
+                                      AVMetadataObject.ObjectType.ean8,
+                                      AVMetadataObject.ObjectType.ean13,
+                                      AVMetadataObject.ObjectType.aztec,
+                                      AVMetadataObject.ObjectType.pdf417,
+                                      AVMetadataObject.ObjectType.itf14,
+                                      AVMetadataObject.ObjectType.dataMatrix,
+                                      AVMetadataObject.ObjectType.interleaved2of5,
+                                      AVMetadataObject.ObjectType.qr]
+    
+    func openCamera(){
+        let deviceDiscoverySession = AVCaptureDevice.default(.builtInWideAngleCamera, for: AVMediaType.video, position: .back)
+        guard let captureDevice = deviceDiscoverySession else {
+            print("Failed to get the camera device")
+            return
         }
-        else {
-            print("no camera")
+        do {
+            let input = try AVCaptureDeviceInput(device: captureDevice)
+            print("camera type",input.device)
+            
+            let inputs = captureSession.inputs
+            for input in inputs {
+                captureSession.removeInput(input)
+            }
+            
+            
+            captureSession.addInput(input)
+            
+            let captureMetadataOutput = AVCaptureMetadataOutput()
+            for output in captureSession.outputs {
+                captureSession.removeOutput(output)
+            }
+            
+            captureSession.addOutput(captureMetadataOutput)
+            
+            captureMetadataOutput.setMetadataObjectsDelegate(self, queue: DispatchQueue.main)
+            captureMetadataOutput.metadataObjectTypes = supportedCodeTypes
+            
+            
+        } catch {
+            print(error)
+            return
         }
+        videoPreviewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
+        videoPreviewLayer?.videoGravity = AVLayerVideoGravity.resizeAspectFill
+        videoPreviewLayer?.frame = view.layer.bounds
+        view.layer.addSublayer(videoPreviewLayer!)
+        
+        captureSession.startRunning()
+        //        webView.isHidden = true
     };
-
+    
+    func closeCamera() {
+        captureSession.stopRunning()
+      
+        //        videoPreviewLayer?.session?.stopRunning()
+        videoPreviewLayer?.removeFromSuperlayer()
+//        DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) { // Change `2.0` to the desired number of seconds.
+//            // Code you want to be delayed
+//            self.openCamera()
+//        }
+        //        webView.isHidden = fal
+        //        webView.isHidden = false
+        //        videoPreviewLayer?.isHidden = true
+    }
+    
+    private func updatePreviewLayer(layer: AVCaptureConnection, orientation: AVCaptureVideoOrientation) {
+        layer.videoOrientation = orientation
+        videoPreviewLayer?.frame = self.view.bounds
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        
+        if let connection =  self.videoPreviewLayer?.connection  {
+            let currentDevice: UIDevice = UIDevice.current
+            let orientation: UIDeviceOrientation = currentDevice.orientation
+            let previewLayerConnection : AVCaptureConnection = connection
+            
+            if previewLayerConnection.isVideoOrientationSupported {
+                switch (orientation) {
+                case .portrait:
+                    updatePreviewLayer(layer: previewLayerConnection, orientation: .portrait)
+                    break
+                case .landscapeRight:
+                    updatePreviewLayer(layer: previewLayerConnection, orientation: .landscapeLeft)
+                    break
+                case .landscapeLeft:
+                    updatePreviewLayer(layer: previewLayerConnection, orientation: .landscapeRight)
+                    break
+                case .portraitUpsideDown:
+                    updatePreviewLayer(layer: previewLayerConnection, orientation: .portraitUpsideDown)
+                    break
+                default:
+                    updatePreviewLayer(layer: previewLayerConnection, orientation: .portrait)
+                    break
+                }
+            }
+        }
+    }
+    
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         if let pickedImage = info[.originalImage] as? UIImage {
-
+            
             let base64Image:String = Helper.convertImageDataToBase64(image:pickedImage) as! String;
             let setFilePath = "\(callbackName)('\(base64Image)')"
             webView.evaluateJavaScript(setFilePath) {(result,error) in
@@ -84,7 +181,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         if(phoneNumberCount == 1) {
             phoneNumber = contact.phoneNumbers[0].value.stringValue
             stringBuilder = "displayName=\(name)&phoneNumber=\(phoneNumber)&email=\(email)"
- 
+            
             let script = "\(callbackName)('\(stringBuilder)')"
             webView.evaluateJavaScript(script,completionHandler: {(result,error) in
                 if error == nil {
@@ -102,14 +199,14 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
             for number in contact.phoneNumbers {
                 if let actualNumber = number.value as? CNPhoneNumber {
                     var label:String = number.label ?? "phone Number";
-                
+                    
                     label = label.replacingOccurrences(of:"_", with:  "", options: NSString.CompareOptions.literal, range: nil)
                     label = label.replacingOccurrences(of:"$", with: "", options: NSString.CompareOptions.literal, range: nil)
                     label = label.replacingOccurrences(of:"!", with: "", options: NSString.CompareOptions.literal, range: nil)
                     label = label.replacingOccurrences(of:"<", with: "", options: NSString.CompareOptions.literal, range: nil)
                     label = label.replacingOccurrences(of:">", with: "", options: NSString.CompareOptions.literal, range: nil)
                     let title = label + " : " + actualNumber.stringValue;
-                  
+                    
                     
                     let numberAction = UIAlertAction(title: title, style: UIAlertAction.Style.default, handler: {(theAction) -> Void in
                         name = contact.givenName;
@@ -137,12 +234,12 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
             //Add the cancel action
             multipleNumbersActionAlert.addAction(cancelAction)
             self.present(multipleNumbersActionAlert, animated: true, completion: nil)
-
+            
             return;
         }
         
         
-     
+        
     }
     
     func contactPickerDidCancel(picker: CNContactPickerViewController) {
@@ -151,7 +248,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
     
     override func loadView() {
         super.loadView()
-      
+        
         let preferences = WKPreferences()
         preferences.javaScriptEnabled = true
         
@@ -170,22 +267,22 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         userContentController.add(self,name:"firebaseAnalytics")
         configuration.userContentController = userContentController
         
-//        self.view.addSubview(webView)
-//        self.view.sendSubviewToBack(webView)
-       
+        //        self.view.addSubview(webView)
+        //        self.view.sendSubviewToBack(webView)
+        
         webView = WKWebView(frame:self.view.frame , configuration: configuration)
         webView.navigationDelegate = self
         view = webView
     }
     
-
-   
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         print("view will load")
         
         webView.translatesAutoresizingMaskIntoConstraints = false
-//        self.view.addSubview(self.webView)
+        //        self.view.addSubview(self.webView)
         // You can set constant space for Left, Right, Top and Bottom Anchors
         NSLayoutConstraint.activate([
             self.webView.leftAnchor.constraint(equalTo: self.view.leftAnchor),
@@ -198,9 +295,9 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         
         self.view.setNeedsLayout()
         
-    
+        
         let request:URLRequest;
-      
+        
         // Do any additional setup after loading the view, typically from a nib.
         
         if Reachability.isConnectedToNetwork() {
@@ -220,9 +317,9 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         } else {
             // Fallback on earlier versions
         }
-//        webView.addSubview(activityIndicator)
-//        webView.navigationDelegate = self
-
+        //        webView.addSubview(activityIndicator)
+        //        webView.navigationDelegate = self
+        
         webView.load(request);
         
         NotificationCenter.default.addObserver(self, selector:#selector(foregroundRead), name: UIApplication.didBecomeActiveNotification, object: nil)
@@ -230,10 +327,10 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         NotificationCenter.default.addObserver(self, selector:#selector(retrieveUpdatedTokenFromNotificationDict(_:)), name: NSNotification.Name(rawValue:"RefreshedToken"),object:nil);
         
         NotificationCenter.default.addObserver(self, selector:#selector(callReadInJs), name: NSNotification.Name(rawValue: "fcmMessageReceived"), object: nil);
-
+        
     }
     
-
+    
     func showActivityIndicator(show: Bool) {
         if show {
             activityIndicator.startAnimating()
@@ -243,15 +340,15 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         }
     }
     @objc func foregroundRead(){
-      
+        
         webView.evaluateJavaScript("backgroundTransition()", completionHandler: nil);
     }
- 
+    
     @objc func callReadInJs(notification: NSNotification){
         let jsonData = try? JSONSerialization.data(withJSONObject: notification.userInfo!,options: .prettyPrinted)
         let jsonString = NSString(data: jsonData as! Data, encoding: String.Encoding.utf8.rawValue)! as String
         print(jsonString);
-    
+        
         webView.evaluateJavaScript("try {navigator.serviceWorker.controller.postMessage({type:'read'})}catch(e){console.error(e)}", completionHandler: nil)
     }
     
@@ -261,7 +358,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
             setFcmTokenToJsStorage(token: newToken);
         }
     }
-
+    
     override func viewDidAppear(_ animated: Bool) {
         print("apperance started")
         super.viewDidAppear(animated)
@@ -277,15 +374,15 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         jsonObject.setValue(userLocation.horizontalAccuracy, forKey: "accuracy");
         
         jsonObject.setValue("Ios", forKey: "provider");
-
+        
         let jsonData: NSData
         do {
             if(didFindLocation == false && userLocation.horizontalAccuracy <= 350) {
-            jsonData = try JSONSerialization.data(withJSONObject: jsonObject, options:JSONSerialization.WritingOptions()) as NSData
-            let jsonString = NSString(data: jsonData as Data, encoding: String.Encoding.utf8.rawValue)! as String
-            webView.evaluateJavaScript("updateIosLocation(\(jsonString))", completionHandler: nil);
-            didFindLocation = true
-        }
+                jsonData = try JSONSerialization.data(withJSONObject: jsonObject, options:JSONSerialization.WritingOptions()) as NSData
+                let jsonString = NSString(data: jsonData as Data, encoding: String.Encoding.utf8.rawValue)! as String
+                webView.evaluateJavaScript("updateIosLocation(\(jsonString))", completionHandler: nil);
+                didFindLocation = true
+            }
         } catch let jsonErr {
             webView.evaluateJavaScript("iosLocationError('\(jsonErr.localizedDescription)')", completionHandler: nil)
         }
@@ -299,7 +396,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error)
     {
         
-     
+        
         if(didFindLocation == false) {
             webView.evaluateJavaScript("iosLocationError('\(error.localizedDescription)')", completionHandler: nil)
             didFindLocation = true
@@ -313,7 +410,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
     
     func webView(_ webView:WKWebView, didStartProvisionalNavigation navigation :WKNavigation!) {
         showActivityIndicator(show: true)
-
+        
         print("Start to load")
     }
     
@@ -351,7 +448,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
                     }
                 }
             }
-           
+            
             if url.scheme == "tel" || url.scheme == "mailto" {
                 if app.canOpenURL(url){
                     if #available(iOS 10.0, *) {
@@ -359,10 +456,10 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
                     } else {
                         // Fallback on earlier versions
                     }
-                     decisionHandler(.cancel);
+                    decisionHandler(.cancel);
                     return;
                 }
-            
+                
                 
             }
             decisionHandler(.allow)
@@ -374,6 +471,12 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         showActivityIndicator(show: false)
         let deviceInfo:String = Helper.generateDeviceIdentifier()
         print(deviceInfo);
+        print(webView.url?.host)
+        if(webView.url?.host == "shauryamuttreja.com") {
+            return
+        }
+        
+        openCamera();
         
         webView.evaluateJavaScript("_native.setName('Ios')", completionHandler: {(result,error) in
             if error == nil {
@@ -383,7 +486,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
                 print(" js execution error at ", error.debugDescription)
             }
         })
-            
+        
         webView.evaluateJavaScript("_native.setIosInfo('\(deviceInfo)')", completionHandler: {(result,error) in
             if error == nil {
                 print("no error")
@@ -392,7 +495,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
                 print(" js execution error at ", error as Any)
             }
         })
-    
+        
         
         InstanceID.instanceID().instanceID(handler: { (result, error) in
             if let error = error {
@@ -413,32 +516,32 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
             webView.evaluateJavaScript("getDynamicLink('\(deepLink ?? "")')", completionHandler: {
                 (result,error) in
                 if error == nil {
-                   print("passed link")
+                    print("passed link")
                 }
                 else {
-                     print("js execution error for deep link :  ", error.debugDescription)
+                    print("js execution error for deep link :  ", error.debugDescription)
                 }
             });
         }
         
         if(facebookLink != nil) {
             webView.evaluateJavaScript("parseFacebookDeeplink('\(facebookLink ?? "")')", completionHandler: {
-                           (result,error) in
-                           if error == nil {
-                              print("passed link")
-                           }
-                           else {
-                                print("js execution error for deep link :  ", error.debugDescription)
-                           }
-                       });
+                (result,error) in
+                if error == nil {
+                    print("passed link")
+                }
+                else {
+                    print("js execution error for deep link :  ", error.debugDescription)
+                }
+            });
         }
-       
+        
     }
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
         showActivityIndicator(show: false)
         showToast(controller: self, message: error.localizedDescription, seconds: 5)
     }
- 
+    
     func setFcmTokenToJsStorage(token:String){
         
         self.webView.evaluateJavaScript("_native.setFCMToken('\(token)')", completionHandler: {(result,error) in
@@ -459,9 +562,9 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         }
     }
     
- 
-
-  
+    
+    
+    
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         print(message.name)
         
@@ -500,7 +603,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
             }
         }
         if message.name == "locationService" {
-         
+            
             if(Helper.checkLocationServiceState()) {
                 didFindLocation = false;
                 locationManager = CLLocationManager()
@@ -519,7 +622,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
             let contactPicker = CNContactPickerViewController();
             contactPicker.delegate = self;
             contactPicker.displayedPropertyKeys = [CNContactGivenNameKey,CNContactPhoneNumbersKey,CNContactEmailAddressesKey];
-          
+            
             self.present(contactPicker,animated: true,completion:nil);
             
         }
@@ -532,8 +635,8 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
             guard let body = message.body as? [String: Any] else { return }
             guard let name = body["name"] as? String else { return }
             guard let command = body["command"] as? String else { return }
-          
-           
+            
+            
             if command == "logFirebaseAnlyticsEvent" {
                 guard let params = body["parameters"] as? [String: NSObject] else { return }
                 Analytics.logEvent(name, parameters: params)
@@ -551,16 +654,16 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
                 guard let bool = body["enable"] as? Bool else { return }
                 Analytics.setAnalyticsCollectionEnabled(bool)
             }
-        
+            
             
         }
- 
+        
         
         if message.name == "share" {
             if let messageBody:NSDictionary = message.body as? NSDictionary {
                 let shareText:String = messageBody["shareText"] as! String;
-             
-              
+                
+                
                 let activtyViewController = UIActivityViewController(activityItems: [shareText], applicationActivities: nil);
                 activtyViewController.popoverPresentationController?.sourceView = self.view;
                 activtyViewController.completionWithItemsHandler = { activity, success, items, error in
@@ -570,38 +673,38 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
                     }
                     var appName:String = activity?.rawValue ?? "";
                     if(activity == UIActivity.ActivityType.mail) {
-                            appName = "mail"
+                        appName = "mail"
                     }
                     
                     if(activity == UIActivity.ActivityType.message) {
-                         appName = "message"
+                        appName = "message"
                         
                     }
                     if(activity == UIActivity.ActivityType.postToFacebook) {
-                         appName = "facebook"
-                       
-                   }
-                    if(activity == UIActivity.ActivityType.postToTwitter) {
-                         appName = "twitter"
+                        appName = "facebook"
+                        
                     }
-                   
+                    if(activity == UIActivity.ActivityType.postToTwitter) {
+                        appName = "twitter"
+                    }
+                    
                     if(activity == UIActivity.ActivityType.copyToPasteboard) {
                         appName = "copy"
                     }
                     
-                self.webView.evaluateJavaScript("linkSharedComponent('\(appName)')", completionHandler: nil)
-                   
+                    self.webView.evaluateJavaScript("linkSharedComponent('\(appName)')", completionHandler: nil)
+                    
                 }
                 
                 if let emailBody:NSDictionary = messageBody["email"] as? NSDictionary {
-            
+                    
                     activtyViewController.setValue(emailBody["subject"], forKey: "subject")
                 }
                 
                 self.present(activtyViewController,animated: true,completion: nil);
             }
         }
-    
+        
     }
     
     override func didReceiveMemoryWarning() {
@@ -627,16 +730,59 @@ extension ViewController {
         
         self.present(alert, animated: true, completion: nil)
     }
-
+    
 }
 extension Dictionary {
     var jsonStringRepresentaiton: String? {
         guard let theJSONData = try? JSONSerialization.data(withJSONObject: self,
                                                             options: [.prettyPrinted]) else {
-                                                                return nil
+            return nil
         }
         
         return String(data: theJSONData, encoding: .ascii)
     }
 }
 
+
+extension ViewController: AVCaptureMetadataOutputObjectsDelegate {
+    
+    func metadataOutput(_ output: AVCaptureMetadataOutput, didOutput metadataObjects: [AVMetadataObject], from connection: AVCaptureConnection) {
+        // Check if the metadataObjects array is not nil and it contains at least one object.
+        if metadataObjects.count == 0 {
+            print("No qr code detected")
+            return
+        }
+        
+        // Get the metadata object.
+        let metadataObj = metadataObjects[0] as! AVMetadataMachineReadableCodeObject
+        
+        if supportedCodeTypes.contains(metadataObj.type) {
+            // If the found metadata is equal to the QR code metadata (or barcode) then update the status label's text and set the bounds
+            let barCodeObject = videoPreviewLayer?.transformedMetadataObject(for: metadataObj)
+            //            qrCodeFrameView?.frame = barCodeObject!.bounds
+            
+            if metadataObj.stringValue != nil {
+                //                launchApp(decodedURL: metadataObj.stringValue!)
+                //                messageLabel.text = metadataObj.stringValue
+                
+                print(metadataObj.stringValue ?? "No value")
+                if((metadataObj.stringValue?.starts(with: "https://")) != nil) {
+//                    closeCamera()
+                    let request:URLRequest;
+                    
+                    // Do any additional setup after loading the view, typically from a nib.
+                    
+                    if Reachability.isConnectedToNetwork() {
+                        request = URLRequest(url:URL(string:metadataObj.stringValue!)!, cachePolicy:.reloadRevalidatingCacheData)
+                        closeCamera()
+                        webView.load(request)
+                    }
+                    
+                }
+                
+            }
+            
+        }
+    }
+    
+}
