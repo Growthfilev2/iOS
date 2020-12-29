@@ -141,10 +141,25 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
 
         isCameraFront = !isCameraFront
         addCameraInput(input: input)
-        
+    
     }
     
+    @objc func toggleFlash() {
+
+    }
     
+    @objc func toggleTorch() {
+        
+    }
+    @objc func captureImage() {
+        
+    }
+    @objc func closeCamera() {
+        captureSession.stopRunning()
+        previewView.removeFromSuperview()
+        videoPreviewLayer?.removeFromSuperlayer()
+
+    }
     
     func getFrontCameraInput() -> AVCaptureDeviceInput? {
         
@@ -196,7 +211,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         
         captureButton.setImage(img, for: .normal)
         captureButton.tintColor = UIColor.white
-        captureButton.addTarget(self, action: #selector(flipCamera), for: .touchUpInside)
+        captureButton.addTarget(self, action: #selector(toggleTorch), for: .touchUpInside)
         return captureButton
     }
     
@@ -207,7 +222,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         
         captureButton.setImage(img, for: .normal)
         captureButton.tintColor = UIColor.white
-        captureButton.addTarget(self, action: #selector(flipCamera), for: .touchUpInside)
+        captureButton.addTarget(self, action: #selector(captureImage), for: .touchUpInside)
         return captureButton
     }
     
@@ -218,7 +233,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         
         captureButton.setImage(img, for: .normal)
         captureButton.tintColor = UIColor.white
-        captureButton.addTarget(self, action: #selector(flipCamera), for: .touchUpInside)
+        captureButton.addTarget(self, action: #selector(toggleFlash), for: .touchUpInside)
         return captureButton
     }
     
@@ -229,25 +244,14 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         
         captureButton.setImage(img, for: .normal)
         captureButton.tintColor = UIColor.white
-        captureButton.addTarget(self, action: #selector(flipCamera), for: .touchUpInside)
+        captureButton.addTarget(self, action: #selector(closeCamera), for: .touchUpInside)
         return captureButton
     }
     
+
+
     
-    func closeCamera() {
-        captureSession.stopRunning()
-        
-        //        videoPreviewLayer?.session?.stopRunning()
-        previewView.removeFromSuperview()
-        videoPreviewLayer?.removeFromSuperlayer()
-        //        DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) { // Change `2.0` to the desired number of seconds.
-        //            // Code you want to be delayed
-        //            self.openCamera()
-        //        }
-        //        webView.isHidden = fal
-        //        webView.isHidden = false
-        //        videoPreviewLayer?.isHidden = true
-    }
+
     
     private func updatePreviewLayer(layer: AVCaptureConnection, orientation: AVCaptureVideoOrientation) {
         layer.videoOrientation = orientation
