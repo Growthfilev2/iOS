@@ -41,7 +41,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
     var flashStatus = AVCaptureDevice.FlashMode.off
     private var photoData: Data?
     var photoOutput = AVCapturePhotoOutput()
-
+    
     private let sessionQueue = DispatchQueue(label: "session queue")
     private let supportedCodeTypes = [AVMetadataObject.ObjectType.upce,
                                       AVMetadataObject.ObjectType.code39,
@@ -69,56 +69,52 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
     }
     
     func setUpCamera(){
-        do {
-            guard let input = getCameraInput() else {
-                print("No camera found")
-                return
-            }
-            
-            print("camera type",input.device)
-            
-            // add the camera input . Default input is back camera
-            addCameraInput(input: input)
-            
-            // set the output. The output contains the live video feed
-            let captureMetadataOutput = AVCaptureMetadataOutput()
-            // clear the existing outputs
-            for output in captureSession.outputs {
-                captureSession.removeOutput(output)
-            }
-            // add the new output
-            captureSession.addOutput(captureMetadataOutput)
-            captureSession.addOutput(photoOutput)
-            captureMetadataOutput.setMetadataObjectsDelegate(self, queue: DispatchQueue.main)
-            captureMetadataOutput.metadataObjectTypes = supportedCodeTypes
-            
-
-            
-            
-           
-            
-//            DispatchQueue.global().async {
-           
-                DispatchQueue.main.async {
-                    self.captureSession.startRunning()
-                    self.videoPreviewLayer = AVCaptureVideoPreviewLayer(session: self.captureSession)
-                    self.videoPreviewLayer?.videoGravity = AVLayerVideoGravity.resizeAspectFill
-                    self.videoPreviewLayer?.frame = self.view.layer.bounds
-                    self.previewView.layer.addSublayer(self.videoPreviewLayer!)
-                    self.previewView.addSubview(self.flipButton())
-                    self.previewView.addSubview(self.closeButton())
-                    self.previewView.addSubview(self.flashButton())
-                    self.previewView.addSubview(self.torchButton())
-                    self.previewView.addSubview(self.takePictureButton())
-                    self.previewView.frame = self.view.frame
-                    self.view.addSubview(self.previewView)
-                    
-                }
-//            }
+        
+        guard let input = getCameraInput() else {
+            print("No camera found")
+            return
         }
-        catch {
-            print(error)
+        
+        print("camera type",input.device)
+        
+        // add the camera input . Default input is back camera
+        addCameraInput(input: input)
+        
+        // set the output. The output contains the live video feed
+        let captureMetadataOutput = AVCaptureMetadataOutput()
+        // clear the existing outputs
+        for output in captureSession.outputs {
+            captureSession.removeOutput(output)
         }
+        // add the new output
+        captureSession.addOutput(captureMetadataOutput)
+        captureSession.addOutput(photoOutput)
+        captureMetadataOutput.setMetadataObjectsDelegate(self, queue: DispatchQueue.main)
+        captureMetadataOutput.metadataObjectTypes = supportedCodeTypes
+        
+        
+        
+        
+        
+        
+        //            DispatchQueue.global().async {
+        
+        DispatchQueue.main.async {
+            self.captureSession.startRunning()
+            self.videoPreviewLayer = AVCaptureVideoPreviewLayer(session: self.captureSession)
+            self.videoPreviewLayer?.videoGravity = AVLayerVideoGravity.resizeAspectFill
+            self.videoPreviewLayer?.frame = self.view.layer.bounds
+            self.previewView.layer.addSublayer(self.videoPreviewLayer!)
+            self.previewView.addSubview(self.flipButton())
+            self.previewView.addSubview(self.closeButton())
+            self.previewView.addSubview(self.flashButton())
+            self.previewView.addSubview(self.torchButton())
+            self.previewView.addSubview(self.takePictureButton())
+            self.previewView.frame = self.view.frame
+            self.view.addSubview(self.previewView)
+            
+        }
+        //            }
         
         
     }
@@ -143,7 +139,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
             print("Could not find specified camera")
             return
         }
-
+        
         isCameraFront = !isCameraFront
         
         // hide torch button if front camera is in use
@@ -177,7 +173,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
     }
     
     @objc func toggleTorch() {
-      
+        
         
         guard let device =  AVCaptureDevice.default(for: .video) , device.hasTorch else {return}
         
@@ -193,35 +189,34 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
             if(device.torchMode == AVCaptureDevice.TorchMode.auto) {
                 device.torchMode = AVCaptureDevice.TorchMode.off
             }
-           
+            
             device.unlockForConfiguration()
         }catch{print(error)}
         
     }
     @objc func captureImage() {
-
+        
         photoOutput.isHighResolutionCaptureEnabled = true
         photoOutput.isLivePhotoCaptureEnabled = false
-
+        
         let photoSettings: AVCapturePhotoSettings
         photoSettings = AVCapturePhotoSettings(format:
                                                 [AVVideoCodecKey: AVVideoCodecType.jpeg])
         photoSettings.isHighResolutionPhotoEnabled =  true
-        
         photoSettings.flashMode = flashStatus
-    
+        
         photoOutput.capturePhoto(with: photoSettings, delegate: self)
         
         
     }
-   
-
+    
+    
     @objc func closeCamera() {
         
-      
+        
         captureSession.stopRunning()
         
-       
+        
         previewView.removeFromSuperview()
         videoPreviewLayer?.removeFromSuperlayer()
         
@@ -274,17 +269,17 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         }
     }
     
- 
+    
     
     func torchButton() -> UIButton{
         let captureButton = UIButton(frame: CGRect(x: (self.view.frame.size.width - 60) , y: 30, width: 48, height: 48))
-
+        
         let img = UIImage(named: "torch")?.withRenderingMode(.alwaysTemplate)
         
         captureButton.setImage(img, for: .normal)
         captureButton.addTarget(self, action: #selector(toggleTorch), for: .touchUpInside)
         setShadow(cameraControlButton:captureButton)
-
+        
         captureButton.tag = 8
         return captureButton
     }
@@ -296,7 +291,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         captureButton.setImage(img, for: .normal)
         captureButton.addTarget(self, action: #selector(closeCamera), for: .touchUpInside)
         setShadow(cameraControlButton:captureButton)
-
+        
         return captureButton
     }
     
@@ -304,7 +299,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         let captureButton = UIButton(frame: CGRect(x: (self.view.frame.size.width - 100) / 2 , y: (self.view.frame.size.height - 100), width: 100, height: 100))
         
         let img = UIImage(named: "shutter")?.withRenderingMode(.alwaysTemplate)
-       
+        
         captureButton.addTarget(self, action: #selector(captureImage), for: .touchUpInside)
         captureButton.setImage(img, for: .normal)
         
@@ -331,13 +326,13 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         captureButton.tag = 9
         captureButton.addTarget(self, action: #selector(toggleFlash), for: .touchUpInside)
         setShadow(cameraControlButton:captureButton)
-
+        
         return captureButton
     }
     
-   
     
-
+    
+    
     func setShadow(cameraControlButton: UIButton) {
         cameraControlButton.tintColor = UIColor.white
         cameraControlButton.backgroundColor = UIColor.clear
@@ -347,51 +342,51 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         cameraControlButton.layer.shadowRadius = 20
         cameraControlButton.layer.masksToBounds = false
     }
-
     
-//    func updateVideoOrientation() {
-//
-//        guard self.videoPreviewLayer.connection?.isVideoOrientationSupported else {
-//            print("isVideoOrientationSupported is false")
-//            return
-//        }
-//
-//        let statusBarOrientation = UIApplication.shared.statusBarOrientation
-//        let videoOrientation: AVCaptureVideoOrientation = statusBarOrientation.videoOrientation ?? .portrait
-//
-//        if self.videoPreviewLayer.connection?.videoOrientation == videoOrientation {
-//            print("no change to videoOrientation")
-//            return
-//        }
-//
-//        self.videoPreviewLayer.frame =
-//        self.videoPreviewLayer.connection.videoOrientation = videoOrientation
-//        self.videoPreviewLayer.removeAllAnimations()
-//    }
-//
-//    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
-//        super.viewWillTransition(to: size, with: coordinator)
-//
-//        coordinator.animate(alongsideTransition: nil, completion: { [weak self] (context) in
-//            DispatchQueue.main.async(execute: {
-//                self?.updateVideoOrientation()
-//            })
-//        })
-//    }
+    
+    //    func updateVideoOrientation() {
+    //
+    //        guard self.videoPreviewLayer.connection?.isVideoOrientationSupported else {
+    //            print("isVideoOrientationSupported is false")
+    //            return
+    //        }
+    //
+    //        let statusBarOrientation = UIApplication.shared.statusBarOrientation
+    //        let videoOrientation: AVCaptureVideoOrientation = statusBarOrientation.videoOrientation ?? .portrait
+    //
+    //        if self.videoPreviewLayer.connection?.videoOrientation == videoOrientation {
+    //            print("no change to videoOrientation")
+    //            return
+    //        }
+    //
+    //        self.videoPreviewLayer.frame =
+    //        self.videoPreviewLayer.connection.videoOrientation = videoOrientation
+    //        self.videoPreviewLayer.removeAllAnimations()
+    //    }
+    //
+    //    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+    //        super.viewWillTransition(to: size, with: coordinator)
+    //
+    //        coordinator.animate(alongsideTransition: nil, completion: { [weak self] (context) in
+    //            DispatchQueue.main.async(execute: {
+    //                self?.updateVideoOrientation()
+    //            })
+    //        })
+    //    }
     
     private func updatePreviewLayer(layer: AVCaptureConnection, orientation: AVCaptureVideoOrientation) {
         layer.videoOrientation = orientation
         videoPreviewLayer?.frame = self.view.bounds
     }
-
+    
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-
+        
         if let connection =  self.videoPreviewLayer?.connection  {
             let currentDevice: UIDevice = UIDevice.current
             let orientation: UIDeviceOrientation = currentDevice.orientation
             let previewLayerConnection : AVCaptureConnection = connection
-
+            
             if previewLayerConnection.isVideoOrientationSupported {
                 switch (orientation) {
                 case .portrait:
@@ -406,7 +401,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
                 case .portraitUpsideDown:
                     updatePreviewLayer(layer: previewLayerConnection, orientation: .portraitUpsideDown)
                     break
-            
+                    
                 default:
                     updatePreviewLayer(layer: previewLayerConnection, orientation: .portrait)
                     break
@@ -553,8 +548,8 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         super.viewDidLoad()
         print("view will load")
         
-              
-     
+        
+        
         
         webView.translatesAutoresizingMaskIntoConstraints = false
         //        self.view.addSubview(self.webView)
@@ -598,7 +593,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         NotificationCenter.default.addObserver(self, selector:#selector(retrieveUpdatedTokenFromNotificationDict(_:)), name: NSNotification.Name(rawValue:"RefreshedToken"),object:nil);
         
         NotificationCenter.default.addObserver(self, selector:#selector(callReadInJs), name: NSNotification.Name(rawValue: "fcmMessageReceived"), object: nil);
-    
+        
         setUpCamera()
     }
     
@@ -975,6 +970,25 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
             }
         }
         
+        if message.name == "openPage" {
+            guard let body = message.body as? [String: Any] else {return}
+            guard let token = body["token"] as? String else {return}
+            guard let latitude = body["latitude"] as? String else {return}
+            guard let longitude = body["longitude"] as? String else {return}
+            guard let url = body["url"] as? String else {return}
+            
+            
+            if Reachability.isConnectedToNetwork() {
+                var request = URLRequest(url:URL(string:url)!, cachePolicy:.reloadRevalidatingCacheData)
+                request.addValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+                request.addValue(latitude, forHTTPHeaderField: "latitude")
+                request.addValue(longitude, forHTTPHeaderField: "longitude")
+                self.webView.load(request)
+                return
+            }
+            
+            showToast(controller: self, message: "Check your internet connection", seconds:5.0)
+        }
     }
     
     override func didReceiveMemoryWarning() {
@@ -1016,6 +1030,12 @@ extension Dictionary {
 
 extension ViewController: AVCaptureMetadataOutputObjectsDelegate {
     
+    
+    func isUrlForApp(encodedString:String) ->Bool {
+        let url = URL(string:encodedString)
+        return Constants.app_associated_domains.contains(url?.host ?? "")
+    }
+    
     func metadataOutput(_ output: AVCaptureMetadataOutput, didOutput metadataObjects: [AVMetadataObject], from connection: AVCaptureConnection) {
         // Check if the metadataObjects array is not nil and it contains at least one object.
         if metadataObjects.count == 0 {
@@ -1028,82 +1048,80 @@ extension ViewController: AVCaptureMetadataOutputObjectsDelegate {
         
         if supportedCodeTypes.contains(metadataObj.type) {
             let barCodeObject = videoPreviewLayer?.transformedMetadataObject(for: metadataObj)
-        
             
-            if metadataObj.stringValue != nil {
+            guard let stringData = metadataObj.stringValue else {return}
             
-                
-                print("qrcode url", metadataObj.stringValue!)
-                
-                if(metadataObj.stringValue!.hasPrefix("https://growthfile.com")) {
-                    let request:URLRequest;
-                    
-//                    Do any additional setup after loading the view, typically from a nib.
-                    
-                    if Reachability.isConnectedToNetwork() {
-                        request = URLRequest(url:URL(string:metadataObj.stringValue!)!, cachePolicy:.reloadRevalidatingCacheData)
-                        closeCamera()
-                        webView.load(request)
-                    }
-                }
-            }
+            print("qrcode url", stringData)
+            
+            guard isUrlForApp(encodedString: stringData) else {return}
+            
+            closeCamera()
+            webView.evaluateJavaScript("handleQRUrl('\(stringData)')", completionHandler: nil)
+            
+            
         }
     }
 }
 
 extension ViewController: AVCapturePhotoCaptureDelegate {
-
-  func photoOutput(_ output: AVCapturePhotoOutput, willCapturePhotoFor resolvedSettings: AVCaptureResolvedPhotoSettings) {
-    // Flash the screen to signal that the camera took a photo.
-//    self.previewView.videoPreviewLayer.opacity = 0
-//    UIView.animate(withDuration: 0.25) {
-//      self.previewView.videoPreviewLayer.opacity = 1
-//    }
-  }
-
-  
+    
+    func photoOutput(_ output: AVCapturePhotoOutput, willCapturePhotoFor resolvedSettings: AVCaptureResolvedPhotoSettings) {
+        // Flash the screen to signal that the camera took a photo.
+        //    self.previewView.videoPreviewLayer.opacity = 0
+        //    UIView.animate(withDuration: 0.25) {
+        //      self.previewView.videoPreviewLayer.opacity = 1
+        //    }
+    }
+    
+    
     func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
         if let error = error {
             print("Error capturing photo: \(error)")
         } else {
             photoData = photo.fileDataRepresentation()
-                        
-//            let cgImage = photo.cgImageRepresentation()!.takeRetainedValue()
-//            let orientation = photo.metadata[kCGImagePropertyOrientation as String] as! NSNumber
-//            let uiOrientation = UIImage.Orientation(rawValue: orientation.intValue)!
-//            let image = UIImage(cgImage: cgImage, scale: 1, orientation: uiOrientation)
+            
+            //            let cgImage = photo.cgImageRepresentation()!.takeRetainedValue()
+            //            let orientation = photo.metadata[kCGImagePropertyOrientation as String] as! NSNumber
+            //            let uiOrientation = UIImage.Orientation(rawValue: orientation.intValue)!
+            //            let image = UIImage(cgImage: cgImage, scale: 1, orientation: uiOrientation)
             closeCamera()
             webView.evaluateJavaScript("setFilePath('\(photoData!.base64EncodedString())')", completionHandler: nil)
             
         }
     }
-
-
-  func photoOutput(_ output: AVCapturePhotoOutput, didFinishCaptureFor resolvedSettings: AVCaptureResolvedPhotoSettings, error: Error?) {
-    if let error = error {
-      print("Error capturing photo: \(error)")
-      return
+    
+    
+    func photoOutput(_ output: AVCapturePhotoOutput, didFinishCaptureFor resolvedSettings: AVCaptureResolvedPhotoSettings, error: Error?) {
+        if let error = error {
+            print("Error capturing photo: \(error)")
+            return
+        }
+        
+        guard let photoData = photoData else {
+            print("No photo data resource")
+            return
+        }
+        
+        PHPhotoLibrary.requestAuthorization { status in
+            if status == .authorized {
+                PHPhotoLibrary.shared().performChanges({
+                    let options = PHAssetResourceCreationOptions()
+                    let creationRequest = PHAssetCreationRequest.forAsset()
+                    creationRequest.addResource(with: .photo, data: photoData, options: options)
+                    
+                }, completionHandler: { _, error in
+                    if let error = error {
+                        print("Error occurred while saving photo to photo library: \(error)")
+                    }
+                })
+            }
+        }
     }
     
-    guard let photoData = photoData else {
-      print("No photo data resource")
-      return
-    }
+}
+
+public struct Constants {
     
-    PHPhotoLibrary.requestAuthorization { status in
-      if status == .authorized {
-        PHPhotoLibrary.shared().performChanges({
-          let options = PHAssetResourceCreationOptions()
-          let creationRequest = PHAssetCreationRequest.forAsset()
-          creationRequest.addResource(with: .photo, data: photoData, options: options)
-          
-        }, completionHandler: { _, error in
-          if let error = error {
-            print("Error occurred while saving photo to photo library: \(error)")
-          }
-        })
-      }
-    }
-  }
-  
+    public static let app_domain:String = "https://app.growthfile.com"
+    public static let app_associated_domains:Array = [app_domain,"https://growthfile.com","https://onduty.growthfile.com"]
 }

@@ -12,14 +12,18 @@ import CoreLocation
 
 class Helper{
     
+    
+    
+    
     static func checkLocationServiceState() -> Bool {
         
         if CLLocationManager.locationServicesEnabled() {
-            
-            switch CLLocationManager.authorizationStatus() {
+            let manager = CLLocationManager()
+           
+            switch manager.authorizationStatus {
             case .notDetermined :
                 return true
-             case .restricted , .denied:
+            case .restricted , .denied:
                 return false
             case .authorizedWhenInUse:
                 return true
@@ -76,8 +80,8 @@ class Helper{
      
         let maxWidth = deviceWidth();
         let maxHeight = deviceHeight();
-        let widthRatio = maxWidth / size.width;
-        let heightRatio = maxHeight / size.height;
+        _ = maxWidth / size.width;
+        _ = maxHeight / size.height;
         let newSize:CGSize;
         var outWidth = size.width;
         var outHeight = size.height;
