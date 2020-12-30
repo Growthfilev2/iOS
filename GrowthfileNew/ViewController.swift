@@ -20,7 +20,7 @@ import FacebookCore
 import FBSDKCoreKit
 import MessageUI
 import AVFoundation
-
+import Photos
 
 class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHandler,UIImagePickerControllerDelegate,UINavigationControllerDelegate,CLLocationManagerDelegate,CNContactPickerDelegate  {
     
@@ -38,6 +38,11 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
     var videoPreviewLayer:AVCaptureVideoPreviewLayer?
     var previewView = UIView()
     var isCameraFront = false
+    var flashStatus = AVCaptureDevice.FlashMode.off
+    private var photoData: Data?
+    var photoOutput = AVCapturePhotoOutput()
+
+    private let sessionQueue = DispatchQueue(label: "session queue")
     private let supportedCodeTypes = [AVMetadataObject.ObjectType.upce,
                                       AVMetadataObject.ObjectType.code39,
                                       AVMetadataObject.ObjectType.code39Mod43,
@@ -83,7 +88,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
             }
             // add the new output
             captureSession.addOutput(captureMetadataOutput)
-            
+            captureSession.addOutput(photoOutput)
             captureMetadataOutput.setMetadataObjectsDelegate(self, queue: DispatchQueue.main)
             captureMetadataOutput.metadataObjectTypes = supportedCodeTypes
             
@@ -91,11 +96,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
             view.addSubview(previewView)
             
             
-            self.view.addSubview(flipButton())
-            self.view.addSubview(closeButton())
-            self.view.addSubview(flashButton())
-            self.view.addSubview(torchButton())
-            self.view.addSubview(captureButton())
+           
             
             DispatchQueue.global().async {
                 self.captureSession.startRunning()
@@ -104,7 +105,12 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
                     self.videoPreviewLayer?.videoGravity = AVLayerVideoGravity.resizeAspectFill
                     self.videoPreviewLayer?.frame = self.view.layer.bounds
                     self.previewView.layer.addSublayer(self.videoPreviewLayer!)
+                    self.view.addSubview(self.flipButton())
+                    self.view.addSubview(self.closeButton())
+        //            self.view.addSubview(flashButton())
                     
+                    self.view.addSubview(self.torchButton())
+                    self.view.addSubview(self.takePictureButton())
                 }
             }
         }
@@ -127,7 +133,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         // add the device input
         captureSession.addInput(input)
         captureSession.commitConfiguration()
-        
+       
         
         
     }
@@ -140,25 +146,88 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         }
 
         isCameraFront = !isCameraFront
+        
+        // hide torch button if front camera is in use
+        if let torchbutton = self.view.viewWithTag(8) as? UIButton {
+            torchbutton.isHidden = isCameraFront
+        }
+        
         addCameraInput(input: input)
-    
+        
     }
     
     @objc func toggleFlash() {
+        guard let flashButton = self.view.viewWithTag(9) as? UIButton else {
+            return
+        }
+       
+        if(flashStatus == AVCaptureDevice.FlashMode.off) {
+            flashStatus = AVCaptureDevice.FlashMode.on
+            flashButton.setImage(UIImage(named: "flip")?.withRenderingMode(.alwaysTemplate), for:.normal )
+            return
+        }
+        if(flashStatus == AVCaptureDevice.FlashMode.on) {
+            flashStatus = AVCaptureDevice.FlashMode.auto
+            flashButton.setImage(UIImage(named: "flip")?.withRenderingMode(.alwaysTemplate), for:.normal )
 
+            return
+        }
+        flashButton.setImage(UIImage(named: "flip")?.withRenderingMode(.alwaysTemplate), for:.normal)
+        flashStatus = AVCaptureDevice.FlashMode.off
     }
     
     @objc func toggleTorch() {
+      
+        
+        guard let device =  AVCaptureDevice.default(for: .video) , device.hasTorch else {return}
+        
+        do {
+            try device.lockForConfiguration()
+            
+            if(device.torchMode == AVCaptureDevice.TorchMode.on) {
+                device.torchMode = AVCaptureDevice.TorchMode.auto
+            }
+            if(device.torchMode == AVCaptureDevice.TorchMode.off)  {
+                device.torchMode = AVCaptureDevice.TorchMode.on
+            }
+            if(device.torchMode == AVCaptureDevice.TorchMode.auto) {
+                device.torchMode = AVCaptureDevice.TorchMode.off
+            }
+           
+            device.unlockForConfiguration()
+        }catch{print(error)}
         
     }
     @objc func captureImage() {
+
+        photoOutput.isHighResolutionCaptureEnabled = true
+        photoOutput.isLivePhotoCaptureEnabled = false
+
+        let photoSettings: AVCapturePhotoSettings
+        photoSettings = AVCapturePhotoSettings(format:
+                                                [AVVideoCodecKey: AVVideoCodecType.jpeg])
+        photoSettings.isHighResolutionPhotoEnabled =  true
+        
+        photoSettings.flashMode = .off
+        photoOutput.capturePhoto(with: photoSettings, delegate: self)
+        
         
     }
+    
+
     @objc func closeCamera() {
         captureSession.stopRunning()
         previewView.removeFromSuperview()
         videoPreviewLayer?.removeFromSuperlayer()
 
+    }
+    
+    
+    func isTorchSupported () -> Bool{
+        guard let device =  AVCaptureDevice.default(for: .video) , device.hasTorch else {return false}
+        if device.isTorchModeSupported(device.torchMode) == false {return false}
+        return true
+        
     }
     
     func getFrontCameraInput() -> AVCaptureDeviceInput? {
@@ -194,7 +263,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
     }
     
     func flipButton() -> UIButton{
-        let captureButton = UIButton(frame: CGRect(x: (self.view.frame.size.width - 100) / 2 , y: (self.view.frame.size.height - 100), width: 100, height: 100))
+        let captureButton = UIButton(frame: CGRect(x: (self.view.frame.size.width - 100) , y: (self.view.frame.size.height - 100), width: 100, height: 100))
         
         let img = UIImage(named: "flip")?.withRenderingMode(.alwaysTemplate)
         
@@ -205,30 +274,38 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
     }
     
     func torchButton() -> UIButton{
-        let captureButton = UIButton(frame: CGRect(x: (self.view.frame.size.width - 100) / 2 , y: (self.view.frame.size.height - 100), width: 100, height: 100))
-        
+        let captureButton = UIButton(frame: CGRect(x: (self.view.frame.size.width - 100) , y: 30, width: 100, height: 100))
+
         let img = UIImage(named: "flip")?.withRenderingMode(.alwaysTemplate)
         
         captureButton.setImage(img, for: .normal)
         captureButton.tintColor = UIColor.white
         captureButton.addTarget(self, action: #selector(toggleTorch), for: .touchUpInside)
+        captureButton.tag = 8
         return captureButton
     }
     
-    func captureButton() -> UIButton{
+    func takePictureButton() -> UIButton{
         let captureButton = UIButton(frame: CGRect(x: (self.view.frame.size.width - 100) / 2 , y: (self.view.frame.size.height - 100), width: 100, height: 100))
         
         let img = UIImage(named: "flip")?.withRenderingMode(.alwaysTemplate)
+       
         
-        captureButton.setImage(img, for: .normal)
         captureButton.tintColor = UIColor.white
         captureButton.addTarget(self, action: #selector(captureImage), for: .touchUpInside)
+    
+        captureButton.setImage(img, for: .normal)
+        captureButton.backgroundColor = UIColor.clear
+        captureButton.layer.shadowColor = UIColor.black.cgColor
+        captureButton.layer.shadowOffset = CGSize(width: 0.0, height: 6.0)
+        captureButton.layer.shadowOpacity = 1
+        captureButton.layer.shadowRadius = 20
+        captureButton.layer.masksToBounds = false
         return captureButton
     }
     
     func flashButton() -> UIButton{
         let captureButton = UIButton(frame: CGRect(x: (self.view.frame.size.width - 100) / 2 , y: (self.view.frame.size.height - 100), width: 100, height: 100))
-        
         let img = UIImage(named: "flip")?.withRenderingMode(.alwaysTemplate)
         
         captureButton.setImage(img, for: .normal)
@@ -238,7 +315,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
     }
     
     func closeButton() -> UIButton{
-        let captureButton = UIButton(frame: CGRect(x: (self.view.frame.size.width - 100) / 2 , y: (self.view.frame.size.height - 100), width: 100, height: 100))
+        let captureButton = UIButton(frame: CGRect(x: 30 , y: 30, width: 100, height: 100))
         
         let img = UIImage(named: "flip")?.withRenderingMode(.alwaysTemplate)
         
@@ -425,6 +502,9 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
     override func viewDidLoad() {
         super.viewDidLoad()
         print("view will load")
+        
+              
+     
         
         webView.translatesAutoresizingMaskIntoConstraints = false
         //        self.view.addSubview(self.webView)
@@ -744,7 +824,6 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
             }
         }
         if message.name == "locationService" {
-            
             if(Helper.checkLocationServiceState()) {
                 didFindLocation = false;
                 locationManager = CLLocationManager()
@@ -931,4 +1010,52 @@ extension ViewController: AVCaptureMetadataOutputObjectsDelegate {
         }
     }
     
+}
+
+extension ViewController: AVCapturePhotoCaptureDelegate {
+
+  func photoOutput(_ output: AVCapturePhotoOutput, willCapturePhotoFor resolvedSettings: AVCaptureResolvedPhotoSettings) {
+    // Flash the screen to signal that the camera took a photo.
+//    self.previewView.videoPreviewLayer.opacity = 0
+//    UIView.animate(withDuration: 0.25) {
+//      self.previewView.videoPreviewLayer.opacity = 1
+//    }
+  }
+  
+  func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
+    if let error = error {
+      print("Error capturing photo: \(error)")
+    } else {
+      photoData = photo.fileDataRepresentation()
+    }
+  }
+
+
+  func photoOutput(_ output: AVCapturePhotoOutput, didFinishCaptureFor resolvedSettings: AVCaptureResolvedPhotoSettings, error: Error?) {
+    if let error = error {
+      print("Error capturing photo: \(error)")
+      return
+    }
+    
+    guard let photoData = photoData else {
+      print("No photo data resource")
+      return
+    }
+    
+    PHPhotoLibrary.requestAuthorization { status in
+      if status == .authorized {
+        PHPhotoLibrary.shared().performChanges({
+          let options = PHAssetResourceCreationOptions()
+          let creationRequest = PHAssetCreationRequest.forAsset()
+          creationRequest.addResource(with: .photo, data: photoData, options: options)
+          
+        }, completionHandler: { _, error in
+          if let error = error {
+            print("Error occurred while saving photo to photo library: \(error)")
+          }
+        })
+      }
+    }
+  }
+  
 }

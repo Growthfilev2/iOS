@@ -9,7 +9,6 @@ target 'GrowthfileNewApp' do
   pod 'Firebase/DynamicLinks'
   pod 'FacebookSDK'
   pod 'FacebookCore'
-  pod 'GoogleMLKit/BarcodeScanning'
 
 end
   
