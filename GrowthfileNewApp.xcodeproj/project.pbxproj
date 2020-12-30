@@ -16,7 +16,6 @@
 		352C2E22218DBC12004B694F /* GrowthfileNewUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 352C2E21218DBC12004B694F /* GrowthfileNewUITests.swift */; };
 		352C2E30218E94F5004B694F /* Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 352C2E2F218E94F5004B694F /* Helper.swift */; };
 		352C2E32218E9F16004B694F /* KeyChainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 352C2E31218E9F16004B694F /* KeyChainService.swift */; };
-		358427C325824FAF0049CC98 /* cameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 358427C225824FAF0049CC98 /* cameraView.swift */; };
 		35F23B6C21A6C0860013396F /* Reachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35F23B6B21A6C0860013396F /* Reachability.swift */; };
 		35F82893254C837D009B83FA /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 35F82892254C837D009B83FA /* GoogleService-Info.plist */; };
 		3A29A3C73FB81257B71F9C8A /* Pods_GrowthfileNewApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EBE979C8D10616F8420EC2B4 /* Pods_GrowthfileNewApp.framework */; };
@@ -56,7 +55,6 @@
 		352C2E23218DBC12004B694F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		352C2E2F218E94F5004B694F /* Helper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helper.swift; sourceTree = "<group>"; };
 		352C2E31218E9F16004B694F /* KeyChainService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyChainService.swift; sourceTree = "<group>"; };
-		358427C225824FAF0049CC98 /* cameraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = cameraView.swift; sourceTree = "<group>"; };
 		35F23B6B21A6C0860013396F /* Reachability.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Reachability.swift; sourceTree = "<group>"; };
 		35F82892254C837D009B83FA /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		C3B12745AFA7A0E970D894C7 /* Pods-GrowthfileNewApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GrowthfileNewApp.release.xcconfig"; path = "Target Support Files/Pods-GrowthfileNewApp/Pods-GrowthfileNewApp.release.xcconfig"; sourceTree = "<group>"; };
@@ -126,7 +124,6 @@
 				352C2E2F218E94F5004B694F /* Helper.swift */,
 				352C2E31218E9F16004B694F /* KeyChainService.swift */,
 				35F23B6B21A6C0860013396F /* Reachability.swift */,
-				358427C225824FAF0049CC98 /* cameraView.swift */,
 			);
 			path = GrowthfileNew;
 			sourceTree = "<group>";
@@ -355,7 +352,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				352C2E04218DBC10004B694F /* ViewController.swift in Sources */,
-				358427C325824FAF0049CC98 /* cameraView.swift in Sources */,
 				352C2E32218E9F16004B694F /* KeyChainService.swift in Sources */,
 				352C2E02218DBC10004B694F /* AppDelegate.swift in Sources */,
 				35F23B6C21A6C0860013396F /* Reachability.swift in Sources */,
