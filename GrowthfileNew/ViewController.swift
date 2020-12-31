@@ -532,10 +532,9 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         userContentController.add(self,name:"logEvent")
         userContentController.add(self,name:"share");
         userContentController.add(self,name:"firebaseAnalytics")
+        userContentController.add(self,name:"openPage")
         configuration.userContentController = userContentController
         
-        //        self.view.addSubview(webView)
-        //        self.view.sendSubviewToBack(webView)
         
         webView = WKWebView(frame:self.view.frame , configuration: configuration)
         webView.navigationDelegate = self
@@ -569,12 +568,12 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         let request:URLRequest;
         
         // Do any additional setup after loading the view, typically from a nib.
-        
+        print("app_domain", "https://"+Constants.app_associated_domains.last!)
         if Reachability.isConnectedToNetwork() {
-            request = URLRequest(url:URL(string:"https://app.growthfile.com")!, cachePolicy:.reloadRevalidatingCacheData)
+            request = URLRequest(url:URL(string:"https://"+Constants.app_associated_domains.last!)!, cachePolicy:.reloadRevalidatingCacheData)
         }
         else {
-            request = URLRequest(url:URL(string:"https://app.growthfile.com")!, cachePolicy:.returnCacheDataElseLoad)
+            request = URLRequest(url:URL(string:"https://"+Constants.app_associated_domains.last!)!, cachePolicy:.returnCacheDataElseLoad)
         }
         
         activityIndicator = UIActivityIndicatorView()
@@ -594,7 +593,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         
         NotificationCenter.default.addObserver(self, selector:#selector(callReadInJs), name: NSNotification.Name(rawValue: "fcmMessageReceived"), object: nil);
         
-        setUpCamera()
+//        setUpCamera()
     }
     
     
@@ -737,9 +736,8 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         print("webview has finished loading");
         showActivityIndicator(show: false)
         let deviceInfo:String = Helper.generateDeviceIdentifier()
-        print(deviceInfo);
-        print(webView.url?.host)
-        if(webView.url?.host == "shauryamuttreja.com") {
+
+        if(webView.url?.host! == "growthfile.com") {
             return
         }
         
@@ -1033,7 +1031,8 @@ extension ViewController: AVCaptureMetadataOutputObjectsDelegate {
     
     func isUrlForApp(encodedString:String) ->Bool {
         let url = URL(string:encodedString)
-        return Constants.app_associated_domains.contains(url?.host ?? "")
+     
+        return Constants.app_associated_domains.contains(url?.host! ?? "")
     }
     
     func metadataOutput(_ output: AVCaptureMetadataOutput, didOutput metadataObjects: [AVMetadataObject], from connection: AVCaptureConnection) {
@@ -1080,12 +1079,11 @@ extension ViewController: AVCapturePhotoCaptureDelegate {
         } else {
             photoData = photo.fileDataRepresentation()
             
-            //            let cgImage = photo.cgImageRepresentation()!.takeRetainedValue()
-            //            let orientation = photo.metadata[kCGImagePropertyOrientation as String] as! NSNumber
-            //            let uiOrientation = UIImage.Orientation(rawValue: orientation.intValue)!
-            //            let image = UIImage(cgImage: cgImage, scale: 1, orientation: uiOrientation)
+            
+            guard let photoImage = UIImage(data:photoData!) else {return}
+
             closeCamera()
-            webView.evaluateJavaScript("setFilePath('\(photoData!.base64EncodedString())')", completionHandler: nil)
+            webView.evaluateJavaScript("setFilePath('\(Helper.convertImageDataToBase64(image:photoImage))')", completionHandler: nil)
             
         }
     }
@@ -1123,5 +1121,5 @@ extension ViewController: AVCapturePhotoCaptureDelegate {
 public struct Constants {
     
     public static let app_domain:String = "https://app.growthfile.com"
-    public static let app_associated_domains:Array = [app_domain,"https://growthfile.com","https://onduty.growthfile.com"]
+    public static let app_associated_domains:Array = ["app.growthfile.com","growthfile.com","onduty.growthfile.com","growthfilev2-0.firebaseapp.com"]
 }

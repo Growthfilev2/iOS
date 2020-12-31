@@ -112,7 +112,8 @@
 	</array>
 	<key>WKAppBoundDomains</key>
 	<array>
-		<string>shauryamuttreja.com</string>
+		<string>onduty.growthfile.com</string>
+		<string>growthfilev2-0.firebaseapp.com</string>
 		<string>growthfile.com</string>
 		<string>app.growthfile.com</string>
 		<string>growthfile.page.link</string>
