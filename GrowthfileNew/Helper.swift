@@ -80,6 +80,7 @@ class Helper{
         let newSize:CGSize
         let (newWidth,newHeight) = calculateAspectRation(image: image)
         
+    
         newSize = CGSize(width: newWidth, height: newHeight)
         let rect = CGRect(x:0,y:0,width: newSize.width,height:newSize.height);
         UIGraphicsBeginImageContextWithOptions(newSize, false, 0.0)
@@ -89,7 +90,7 @@ class Helper{
         return newImage!
     }
     
-    static func calculateAspectRation(image:UIImage) -> (Float,Float) {
+    static func calculateAspectRation(image:UIImage) -> (CGFloat,CGFloat) {
         let srcWidth = image.size.width
         let srcHeight = image.size.height
         
@@ -97,8 +98,8 @@ class Helper{
         let maxHeight = deviceHeight()
         let ratio = min(maxWidth/srcWidth, maxHeight/srcHeight)
         
-        let calcWidth = Float(srcWidth*ratio)
-        let calHeight = Float(srcHeight*ratio)
+        let calcWidth = srcWidth*ratio
+        let calHeight = srcHeight*ratio
         return (calcWidth,calHeight)
     }
 }
