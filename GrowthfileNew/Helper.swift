@@ -76,36 +76,30 @@ class Helper{
     }
     
     static func resizeImage(image:UIImage) -> UIImage {
-        let size = image.size;
-     
-        let maxWidth = deviceWidth();
-        let maxHeight = deviceHeight();
-        _ = maxWidth / size.width;
-        _ = maxHeight / size.height;
-        let newSize:CGSize;
-        var outWidth = size.width;
-        var outHeight = size.height;
-        if(size.width > size.height) {
-            if(size.width > maxWidth) {
-                outWidth = maxWidth;
-                outHeight = (outHeight * maxWidth) / size.width
-            }
-        }
-        else {
-            if(size.height > maxHeight) {
-                outHeight = maxHeight;
-                outWidth = (outWidth * maxHeight) / size.height
-            }
-        }
-        newSize = CGSize(width: outWidth, height: outHeight)
+
+        let (newWidth,newHeight) = calculateAspectRation(image: image)
+        
+        
+        let newSize = CGSize(width: newWidth, height: newHeight)
+        
         let rect = CGRect(x:0,y:0,width: newSize.width,height:newSize.height);
         UIGraphicsBeginImageContextWithOptions(newSize, false, 0.0)
         image.draw(in: rect)
         let newImage = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
-      
         return newImage!
-      
-
+    }
+    
+    static func calculateAspectRation(image:UIImage) -> (Float,Float) {
+        let srcWidth = image.size.width
+        let srcHeight = image.size.height
+        
+        let maxWidth = deviceWidth()
+        let maxHeight = deviceHeight()
+        let ratio = min(maxWidth/srcWidth, maxHeight/srcHeight)
+        
+        let calcWidth = Float(srcWidth*ratio)
+        let calHeight = Float(srcHeight*ratio)
+        return (calcWidth,calHeight)
     }
 }
