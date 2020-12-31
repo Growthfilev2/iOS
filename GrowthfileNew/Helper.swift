@@ -76,12 +76,11 @@ class Helper{
     }
     
     static func resizeImage(image:UIImage) -> UIImage {
-
+        
+        let newSize:CGSize
         let (newWidth,newHeight) = calculateAspectRation(image: image)
         
-        
-        let newSize = CGSize(width: newWidth, height: newHeight)
-        
+        newSize = CGSize(width: newWidth, height: newHeight)
         let rect = CGRect(x:0,y:0,width: newSize.width,height:newSize.height);
         UIGraphicsBeginImageContextWithOptions(newSize, false, 0.0)
         image.draw(in: rect)
