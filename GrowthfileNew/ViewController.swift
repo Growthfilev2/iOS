@@ -92,11 +92,6 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         captureMetadataOutput.setMetadataObjectsDelegate(self, queue: DispatchQueue.main)
         captureMetadataOutput.metadataObjectTypes = supportedCodeTypes
         
-        
-        
-        
-        
-        
         //            DispatchQueue.global().async {
         
         DispatchQueue.main.async {
@@ -420,7 +415,6 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
                     print ("success in sending base64 image to js")
                 }
                 else {
-                    
                     print("error in sending base64 image to js" , error!)
                 }
             }
@@ -615,7 +609,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         let jsonString = NSString(data: jsonData as! Data, encoding: String.Encoding.utf8.rawValue)! as String
         print(jsonString);
         
-        webView.evaluateJavaScript("try {navigator.serviceWorker.controller.postMessage('\(jsonString)')}catch(e){console.error(e)}", completionHandler: nil)
+        webView.evaluateJavaScript("try {navigator.serviceWorker.controller.postMessage(\(jsonString))}catch(e){console.error(e)}", completionHandler: nil)
     }
     
     @objc func retrieveUpdatedTokenFromNotificationDict(_ notification :NSNotification){
@@ -836,6 +830,20 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
             callbackName = message.body as! String
             setUpCamera()
         }
+        
+        if message.name == "openNativeCamera" {
+            callbackName = message.body as! String
+            if UIImagePickerController.isSourceTypeAvailable(UIImagePickerController.SourceType.camera){
+                let imagePicker = UIImagePickerController()
+                imagePicker.delegate = self
+                imagePicker.sourceType = UIImagePickerController.SourceType.camera
+                self.present(imagePicker, animated: true, completion: nil)
+            }
+            else {
+                print("no camera")
+            }
+        }
+        
         
         if message.name == "updateApp" {
             
@@ -1067,31 +1075,32 @@ extension ViewController: AVCapturePhotoCaptureDelegate {
     
     func photoOutput(_ output: AVCapturePhotoOutput, willCapturePhotoFor resolvedSettings: AVCaptureResolvedPhotoSettings) {
         // Flash the screen to signal that the camera took a photo.
-        
-        self.videoPreviewLayer?.opacity = 0
+        DispatchQueue.main.async {
+            
+            self.videoPreviewLayer?.opacity = 0
             UIView.animate(withDuration: 0.25) {
-              self.videoPreviewLayer?.opacity = 1
+                self.videoPreviewLayer?.opacity = 1
             }
-    }
-    
-    
-    func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
-        if let error = error {
-            print("Error capturing photo: \(error)")
-        } else {
-            photoData = photo.fileDataRepresentation()
-            
-            
-            guard let photoImage = UIImage(data:photoData!) else {return}
-
-            closeCamera()
-            webView.evaluateJavaScript("setFilePath('\(Helper.convertImageDataToBase64(image:photoImage))')", completionHandler: nil)
-            
         }
     }
     
     
+    func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
+        
+        if let error = error {
+            print("Error capturing photo: \(error)")
+            return
+        }
+
+        photoData = photo.fileDataRepresentation()
+            
+
+    }
+    
+    
     func photoOutput(_ output: AVCapturePhotoOutput, didFinishCaptureFor resolvedSettings: AVCaptureResolvedPhotoSettings, error: Error?) {
+        
+       
         if let error = error {
             print("Error capturing photo: \(error)")
             return
@@ -1102,20 +1111,9 @@ extension ViewController: AVCapturePhotoCaptureDelegate {
             return
         }
         
-        PHPhotoLibrary.requestAuthorization { status in
-            if status == .authorized {
-                PHPhotoLibrary.shared().performChanges({
-                    let options = PHAssetResourceCreationOptions()
-                    let creationRequest = PHAssetCreationRequest.forAsset()
-                    creationRequest.addResource(with: .photo, data: photoData, options: options)
-                    
-                }, completionHandler: { _, error in
-                    if let error = error {
-                        print("Error occurred while saving photo to photo library: \(error)")
-                    }
-                })
-            }
-        }
+        guard let photoImage = UIImage(data:photoData) else {return}
+        closeCamera()
+        webView.evaluateJavaScript("setFilePath('\(Helper.convertImageDataToBase64(image:photoImage))')", completionHandler: nil)
     }
     
 }
