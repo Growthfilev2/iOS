@@ -615,7 +615,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         let jsonString = NSString(data: jsonData as! Data, encoding: String.Encoding.utf8.rawValue)! as String
         print(jsonString);
         
-        webView.evaluateJavaScript("try {navigator.serviceWorker.controller.postMessage({type:'read'})}catch(e){console.error(e)}", completionHandler: nil)
+        webView.evaluateJavaScript("try {navigator.serviceWorker.controller.postMessage('\(jsonString)')}catch(e){console.error(e)}", completionHandler: nil)
     }
     
     @objc func retrieveUpdatedTokenFromNotificationDict(_ notification :NSNotification){
@@ -913,6 +913,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
                 guard let id = body["id"] as? String else { return }
                 Analytics.setUserID(id)
             }
+            
             if command == "setAnalyticsCollectionEnabled" {
                 guard let bool = body["enable"] as? Bool else { return }
                 Analytics.setAnalyticsCollectionEnabled(bool)
@@ -1066,10 +1067,11 @@ extension ViewController: AVCapturePhotoCaptureDelegate {
     
     func photoOutput(_ output: AVCapturePhotoOutput, willCapturePhotoFor resolvedSettings: AVCaptureResolvedPhotoSettings) {
         // Flash the screen to signal that the camera took a photo.
-        //    self.previewView.videoPreviewLayer.opacity = 0
-        //    UIView.animate(withDuration: 0.25) {
-        //      self.previewView.videoPreviewLayer.opacity = 1
-        //    }
+        
+        self.videoPreviewLayer?.opacity = 0
+            UIView.animate(withDuration: 0.25) {
+              self.videoPreviewLayer?.opacity = 1
+            }
     }
     
     
