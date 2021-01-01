@@ -20,6 +20,7 @@ import FacebookCore
 import FBSDKCoreKit
 import MessageUI
 import AVFoundation
+import AppTrackingTransparency
 import Photos
 
 class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHandler,UIImagePickerControllerDelegate,UINavigationControllerDelegate,CLLocationManagerDelegate,CNContactPickerDelegate  {
@@ -59,6 +60,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
     
     
     func getCameraInput() -> AVCaptureDeviceInput? {
+       
         if getBackCameraInput() != nil {
             return getBackCameraInput()
         }
@@ -478,10 +480,22 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
     
     override func loadView() {
         super.loadView()
+        ATTrackingManager.requestTrackingAuthorization(completionHandler: {status in
+            switch status {
+            case .authorized:
+                FBSDKCoreKit.Settings.setAdvertiserTrackingEnabled(true)
+            case .notDetermined:
+                FBSDKCoreKit.Settings.setAdvertiserTrackingEnabled(true)
+            case .restricted:
+                FBSDKCoreKit.Settings.setAdvertiserTrackingEnabled(false)
+            case .denied:
+                FBSDKCoreKit.Settings.setAdvertiserTrackingEnabled(false)
+            }
+        })
         
         let preferences = WKPreferences()
         WKWebpagePreferences().allowsContentJavaScript = true
-//        preferences.javaScriptEnabled = true
+        
         
         let configuration = WKWebViewConfiguration()
         configuration.preferences = preferences
@@ -497,6 +511,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         userContentController.add(self,name:"logEvent")
         userContentController.add(self,name:"share");
         userContentController.add(self,name:"firebaseAnalytics")
+        userContentController.add(self,name:"openNativeCamera")
         userContentController.add(self,name:"openPage")
         configuration.userContentController = userContentController
         
@@ -504,6 +519,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         webView = WKWebView(frame:self.view.frame , configuration: configuration)
         webView.navigationDelegate = self
         view = webView
+        
     }
     
     
@@ -511,10 +527,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
     override func viewDidLoad() {
         super.viewDidLoad()
         print("view will load")
-        
-        
-        
-        
+    
         webView.translatesAutoresizingMaskIntoConstraints = false
         //        self.view.addSubview(self.webView)
         // You can set constant space for Left, Right, Top and Bottom Anchors
@@ -533,12 +546,11 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         let request:URLRequest;
         
         // Do any additional setup after loading the view, typically from a nib.
-        print("app_domain", "https://"+Constants.app_associated_domains.last!)
         if Reachability.isConnectedToNetwork() {
-            request = URLRequest(url:URL(string:"https://"+Constants.app_associated_domains.last!)!, cachePolicy:.reloadRevalidatingCacheData)
+            request = URLRequest(url:URL(string:Constants.app_domain)!, cachePolicy:.reloadRevalidatingCacheData)
         }
         else {
-            request = URLRequest(url:URL(string:"https://"+Constants.app_associated_domains.last!)!, cachePolicy:.returnCacheDataElseLoad)
+            request = URLRequest(url:URL(string:Constants.app_domain)!, cachePolicy:.returnCacheDataElseLoad)
         }
         
         activityIndicator = UIActivityIndicatorView()
@@ -558,7 +570,6 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         
         NotificationCenter.default.addObserver(self, selector:#selector(callReadInJs), name: NSNotification.Name(rawValue: "fcmMessageReceived"), object: nil);
         
-//        setUpCamera()
     }
     
     
@@ -735,15 +746,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
             }
         }
         
-//        InstanceID.instanceID().instanceID(handler: { (result, error) in
-//            if let error = error {
-//                print("Error fetching remote instange ID: \(error)")
-//            }
-//            else if let result = result {
-//                print("Remote instance ID token: \(result.token)")
-//                self.setFcmTokenToJsStorage(token:result.token)
-//            }
-//        })
+
         
         let appDelegate = UIApplication.shared.delegate as! AppDelegate;
         let deepLink = appDelegate.deepLink
@@ -1110,5 +1113,5 @@ extension ViewController: AVCapturePhotoCaptureDelegate {
 public struct Constants {
     
     public static let app_domain:String = "https://app.growthfile.com"
-    public static let app_associated_domains:Array = ["app.growthfile.com","growthfile.com","onduty.growthfile.com","growthfilev2-0.firebaseapp.com"]
+    public static let app_associated_domains:Array = ["app.growthfile.com","growthfile.com","onduty.growthfile.com"]
 }

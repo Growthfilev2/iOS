@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>NSUserTrackingUsageDescription</key>
+	<string>We collect app events that are relayed to facbook to better manage user guestures</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
@@ -113,7 +115,6 @@
 	<key>WKAppBoundDomains</key>
 	<array>
 		<string>onduty.growthfile.com</string>
-		<string>growthfilev2-0.firebaseapp.com</string>
 		<string>growthfile.com</string>
 		<string>app.growthfile.com</string>
 		<string>growthfile.page.link</string>

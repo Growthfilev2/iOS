@@ -28,19 +28,19 @@
             
             FirebaseApp.configure()
             Messaging.messaging().delegate = self
-//            registerForPushNotification(application: application)
+            //            registerForPushNotification(application: application)
             if #available(iOS 10.0, *) {
-              // For iOS 10 display notification (sent via APNS)
-              UNUserNotificationCenter.current().delegate = self
-
-              let authOptions: UNAuthorizationOptions = [.alert, .badge, .sound]
-              UNUserNotificationCenter.current().requestAuthorization(
-                options: authOptions,
-                completionHandler: {_, _ in })
+                // For iOS 10 display notification (sent via APNS)
+                UNUserNotificationCenter.current().delegate = self
+                
+                let authOptions: UNAuthorizationOptions = [.alert, .badge, .sound]
+                UNUserNotificationCenter.current().requestAuthorization(
+                    options: authOptions,
+                    completionHandler: {_, _ in })
             } else {
-              let settings: UIUserNotificationSettings =
-              UIUserNotificationSettings(types: [.alert, .badge, .sound], categories: nil)
-              application.registerUserNotificationSettings(settings)
+                let settings: UIUserNotificationSettings =
+                    UIUserNotificationSettings(types: [.alert, .badge, .sound], categories: nil)
+                application.registerUserNotificationSettings(settings)
             }
             application.registerForRemoteNotifications()
             
@@ -68,7 +68,7 @@
                     
                     self.deepLink =  dynamiclink?.url?.absoluteString;
                     let viewController = UIApplication.shared.windows.first!.rootViewController as! ViewController;
-                   
+                    
                     print("deep link: "+self.deepLink! ?? "");
                     viewController.webView.evaluateJavaScript("getDynamicLink('\(self.deepLink ?? "")')", completionHandler: {(result,error) in
                         if error == nil {
@@ -86,13 +86,19 @@
         }
         
         
-        
-        @available(iOS 9.0, *)
-        func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any]) -> Bool {
+        func application(
+            _ app: UIApplication,
+            open url: URL,
+            options: [UIApplication.OpenURLOptionsKey : Any] = [:]
+        ) -> Bool {
             
-            return application(app, open: url,
-                               sourceApplication: options[UIApplication.OpenURLOptionsKey.sourceApplication] as? String,
-                               annotation: "")
+            ApplicationDelegate.shared.application(
+                app,
+                open: url,
+                sourceApplication: options[UIApplication.OpenURLOptionsKey.sourceApplication] as? String,
+                annotation: options[UIApplication.OpenURLOptionsKey.annotation]
+            )
+            
         }
         
         func application(_ application: UIApplication, open url: URL, sourceApplication: String?, annotation: Any) -> Bool {
@@ -155,14 +161,14 @@
             print(error.localizedDescription)
         }
         // [START receive_message]
-         func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: Any]) {
-           // If you are receiving a notification message while your app is in the background,
-           // this callback will not be fired till the user taps on the notification launching the application.
-
-           // Print full message.
-           print(userInfo)
-
-         }
+        func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: Any]) {
+            // If you are receiving a notification message while your app is in the background,
+            // this callback will not be fired till the user taps on the notification launching the application.
+            
+            // Print full message.
+            print(userInfo)
+            
+        }
         func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: Any],
                          fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
             completionHandler(UIBackgroundFetchResult.newData)
@@ -248,16 +254,16 @@
             else {
                 completionHandler([[]])
             }
-           
+            
         }
-
+        
         func userNotificationCenter(_ center: UNUserNotificationCenter,
                                     didReceive response: UNNotificationResponse,
                                     withCompletionHandler completionHandler: @escaping () -> Void) {
             
-
-                NotificationCenter.default.post(name:NSNotification.Name(rawValue: "fcmMessageReceived"),object:nil,userInfo:response.notification.request.content.userInfo)
-                completionHandler();
+            
+            NotificationCenter.default.post(name:NSNotification.Name(rawValue: "fcmMessageReceived"),object:nil,userInfo:response.notification.request.content.userInfo)
+            completionHandler();
             
         }
     }

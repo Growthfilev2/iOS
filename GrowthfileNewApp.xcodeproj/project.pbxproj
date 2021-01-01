@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 51;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -16,9 +16,10 @@
 		352C2E22218DBC12004B694F /* GrowthfileNewUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 352C2E21218DBC12004B694F /* GrowthfileNewUITests.swift */; };
 		352C2E30218E94F5004B694F /* Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 352C2E2F218E94F5004B694F /* Helper.swift */; };
 		352C2E32218E9F16004B694F /* KeyChainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 352C2E31218E9F16004B694F /* KeyChainService.swift */; };
+		3556A681259F31C30039AB5C /* FacebookCore in Frameworks */ = {isa = PBXBuildFile; productRef = 3556A680259F31C30039AB5C /* FacebookCore */; };
 		35F23B6C21A6C0860013396F /* Reachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35F23B6B21A6C0860013396F /* Reachability.swift */; };
 		35F82893254C837D009B83FA /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 35F82892254C837D009B83FA /* GoogleService-Info.plist */; };
-		73AE9B4C1F654CD6890A7233 /* Pods_GrowthfileNewApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 21A0950DC12718DFF6D3B232 /* Pods_GrowthfileNewApp.framework */; };
+		8784CA71B6F874D7C10C4D13 /* Pods_GrowthfileNewApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE252B81BCA2E0C7B84A6D6F /* Pods_GrowthfileNewApp.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -39,8 +40,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		21A0950DC12718DFF6D3B232 /* Pods_GrowthfileNewApp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_GrowthfileNewApp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		3487D7A5109D8C0C643D517C /* Pods-GrowthfileNewApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GrowthfileNewApp.release.xcconfig"; path = "Target Support Files/Pods-GrowthfileNewApp/Pods-GrowthfileNewApp.release.xcconfig"; sourceTree = "<group>"; };
 		3520A07E21EDFCAC000CFEED /* GrowthfileNewApp.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = GrowthfileNewApp.entitlements; sourceTree = "<group>"; };
 		352C2DFE218DBC10004B694F /* GrowthfileNewApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GrowthfileNewApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		352C2E01218DBC10004B694F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -59,7 +58,9 @@
 		352C2E31218E9F16004B694F /* KeyChainService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyChainService.swift; sourceTree = "<group>"; };
 		35F23B6B21A6C0860013396F /* Reachability.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Reachability.swift; sourceTree = "<group>"; };
 		35F82892254C837D009B83FA /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
-		F06F30CA3D67F8A853A0B3E9 /* Pods-GrowthfileNewApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GrowthfileNewApp.debug.xcconfig"; path = "Target Support Files/Pods-GrowthfileNewApp/Pods-GrowthfileNewApp.debug.xcconfig"; sourceTree = "<group>"; };
+		809DC7BF3B2C327AAEDD63E2 /* Pods-GrowthfileNewApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GrowthfileNewApp.release.xcconfig"; path = "Target Support Files/Pods-GrowthfileNewApp/Pods-GrowthfileNewApp.release.xcconfig"; sourceTree = "<group>"; };
+		9CFE679D7C8E3B7C78E73928 /* Pods-GrowthfileNewApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GrowthfileNewApp.debug.xcconfig"; path = "Target Support Files/Pods-GrowthfileNewApp/Pods-GrowthfileNewApp.debug.xcconfig"; sourceTree = "<group>"; };
+		CE252B81BCA2E0C7B84A6D6F /* Pods_GrowthfileNewApp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_GrowthfileNewApp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -67,7 +68,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				73AE9B4C1F654CD6890A7233 /* Pods_GrowthfileNewApp.framework in Frameworks */,
+				8784CA71B6F874D7C10C4D13 /* Pods_GrowthfileNewApp.framework in Frameworks */,
+				3556A681259F31C30039AB5C /* FacebookCore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -97,7 +99,7 @@
 				352C2E20218DBC12004B694F /* GrowthfileNewUITests */,
 				352C2DFF218DBC10004B694F /* Products */,
 				CAEA8A712A5F3172C45B178E /* Pods */,
-				3FC6C78B020C4CC11F11DC89 /* Frameworks */,
+				5DE9DBEC6A3F3F3ECDFF3599 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -146,10 +148,10 @@
 			path = GrowthfileNewUITests;
 			sourceTree = "<group>";
 		};
-		3FC6C78B020C4CC11F11DC89 /* Frameworks */ = {
+		5DE9DBEC6A3F3F3ECDFF3599 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				21A0950DC12718DFF6D3B232 /* Pods_GrowthfileNewApp.framework */,
+				CE252B81BCA2E0C7B84A6D6F /* Pods_GrowthfileNewApp.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -157,8 +159,8 @@
 		CAEA8A712A5F3172C45B178E /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				F06F30CA3D67F8A853A0B3E9 /* Pods-GrowthfileNewApp.debug.xcconfig */,
-				3487D7A5109D8C0C643D517C /* Pods-GrowthfileNewApp.release.xcconfig */,
+				9CFE679D7C8E3B7C78E73928 /* Pods-GrowthfileNewApp.debug.xcconfig */,
+				809DC7BF3B2C327AAEDD63E2 /* Pods-GrowthfileNewApp.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -170,17 +172,20 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 352C2E26218DBC12004B694F /* Build configuration list for PBXNativeTarget "GrowthfileNewApp" */;
 			buildPhases = (
-				2F65783EEE41667C3294E325 /* [CP] Check Pods Manifest.lock */,
+				CDA5530027106E904BECDF3C /* [CP] Check Pods Manifest.lock */,
 				352C2DFA218DBC10004B694F /* Sources */,
 				352C2DFB218DBC10004B694F /* Frameworks */,
 				352C2DFC218DBC10004B694F /* Resources */,
-				C296271D5895F13304B4DF51 /* [CP] Embed Pods Frameworks */,
+				A3F51C78B73F41ACDAAF6281 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			name = GrowthfileNewApp;
+			packageProductDependencies = (
+				3556A680259F31C30039AB5C /* FacebookCore */,
+			);
 			productName = GrowthfileNew;
 			productReference = 352C2DFE218DBC10004B694F /* GrowthfileNewApp.app */;
 			productType = "com.apple.product-type.application";
@@ -265,6 +270,9 @@
 				Base,
 			);
 			mainGroup = 352C2DF5218DBC10004B694F;
+			packageReferences = (
+				3556A67F259F31C30039AB5C /* XCRemoteSwiftPackageReference "facebook-ios-sdk" */,
+			);
 			productRefGroup = 352C2DFF218DBC10004B694F /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -305,7 +313,24 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		2F65783EEE41667C3294E325 /* [CP] Check Pods Manifest.lock */ = {
+		A3F51C78B73F41ACDAAF6281 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-GrowthfileNewApp/Pods-GrowthfileNewApp-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-GrowthfileNewApp/Pods-GrowthfileNewApp-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-GrowthfileNewApp/Pods-GrowthfileNewApp-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		CDA5530027106E904BECDF3C /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -325,23 +350,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		C296271D5895F13304B4DF51 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-GrowthfileNewApp/Pods-GrowthfileNewApp-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-GrowthfileNewApp/Pods-GrowthfileNewApp-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-GrowthfileNewApp/Pods-GrowthfileNewApp-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -530,7 +538,7 @@
 		};
 		352C2E27218DBC12004B694F /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = F06F30CA3D67F8A853A0B3E9 /* Pods-GrowthfileNewApp.debug.xcconfig */;
+			baseConfigurationReference = 9CFE679D7C8E3B7C78E73928 /* Pods-GrowthfileNewApp.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -634,7 +642,7 @@
 		};
 		352C2E28218DBC12004B694F /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 3487D7A5109D8C0C643D517C /* Pods-GrowthfileNewApp.release.xcconfig */;
+			baseConfigurationReference = 809DC7BF3B2C327AAEDD63E2 /* Pods-GrowthfileNewApp.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -857,6 +865,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		3556A67F259F31C30039AB5C /* XCRemoteSwiftPackageReference "facebook-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/facebook/facebook-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.2.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		3556A680259F31C30039AB5C /* FacebookCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3556A67F259F31C30039AB5C /* XCRemoteSwiftPackageReference "facebook-ios-sdk" */;
+			productName = FacebookCore;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 352C2DF6218DBC10004B694F /* Project object */;
 }
