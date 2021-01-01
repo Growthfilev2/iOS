@@ -22,24 +22,34 @@
         var deepLink: String?
         var facebookLink:String?
         let gcmMessageIDKey = "gcm.message_id"
-        
+        var isInBackground = false
         
         func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
             
             FirebaseApp.configure()
-            registerForPushNotification(application: application)
+            Messaging.messaging().delegate = self
+//            registerForPushNotification(application: application)
+            if #available(iOS 10.0, *) {
+              // For iOS 10 display notification (sent via APNS)
+              UNUserNotificationCenter.current().delegate = self
+
+              let authOptions: UNAuthorizationOptions = [.alert, .badge, .sound]
+              UNUserNotificationCenter.current().requestAuthorization(
+                options: authOptions,
+                completionHandler: {_, _ in })
+            } else {
+              let settings: UIUserNotificationSettings =
+              UIUserNotificationSettings(types: [.alert, .badge, .sound], categories: nil)
+              application.registerUserNotificationSettings(settings)
+            }
+            application.registerForRemoteNotifications()
+            
             AppLinkUtility.fetchDeferredAppLink { (url, error) in
                 if let error = error {
                     print("Received error while fetching deferred app link %@", error)
                 }
                 if let url = url {
                     self.facebookLink = url.absoluteString;
-                    
-                    //                    if #available(iOS 10, *) {
-                    //                        UIApplication.shared.open(url, options: [:], completionHandler: nil)
-                    //                    } else {
-                    //                        UIApplication.shared.openURL(url)
-                    //                    }
                 }
             }
             
@@ -144,7 +154,15 @@
         func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
             print(error.localizedDescription)
         }
-        
+        // [START receive_message]
+         func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: Any]) {
+           // If you are receiving a notification message while your app is in the background,
+           // this callback will not be fired till the user taps on the notification launching the application.
+
+           // Print full message.
+           print(userInfo)
+
+         }
         func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: Any],
                          fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
             completionHandler(UIBackgroundFetchResult.newData)
@@ -159,6 +177,7 @@
         func applicationDidEnterBackground(_ application: UIApplication) {
             // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
             // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
+            isInBackground = true
             print("app in background")
         }
         
@@ -166,9 +185,11 @@
         func applicationWillEnterForeground(_ application: UIApplication) {
             // Called as part of the transition from the background to the active state; here you can undo many of the changes made on entering the background.
             print("view has beome active")
+            isInBackground = false
         }
         
         func applicationDidBecomeActive(_ application: UIApplication) {
+            
             let locationServiceAvailable =  Helper.checkLocationServiceState()
             if locationServiceAvailable == false {
                 locationAlert(title: "Location Services Disabled",message:"Please turn on Location to use OnDuty")
@@ -205,10 +226,9 @@
         }
     }
     
-    extension MessagingDelegate {
-        func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String) {
-            print("Firebase registration token: \(fcmToken)")
-            let fcmToken:[String:String] = ["updatedToken":fcmToken]
+    extension AppDelegate : MessagingDelegate {
+        func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
+            let fcmToken:[String:String] = ["updatedToken":fcmToken ?? ""]
             NotificationCenter.default.post(name: NSNotification.Name(rawValue: "RefreshedToken"),object:nil,userInfo:fcmToken)
         }
     }
@@ -222,24 +242,22 @@
                                     withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
             
             NotificationCenter.default.post(name:NSNotification.Name(rawValue: "fcmMessageReceived"),object:nil,userInfo:notification.request.content.userInfo)
+            if isInBackground {
+                completionHandler([[.banner, .sound]])
+            }
+            else {
+                completionHandler([[]])
+            }
+           
         }
-        
-        /// Handle tap on the notification banner
-        ///
-        /// - Parameters:
-        ///   - center: Notification Center
-        ///   - response: Notification response
+
         func userNotificationCenter(_ center: UNUserNotificationCenter,
                                     didReceive response: UNNotificationResponse,
                                     withCompletionHandler completionHandler: @escaping () -> Void) {
             
-            DispatchQueue.main.asyncAfter(deadline: .now() + 4.0) { // Change `2.0` to the desired number of seconds.
-                // Code you want to be delayed
+
                 NotificationCenter.default.post(name:NSNotification.Name(rawValue: "fcmMessageReceived"),object:nil,userInfo:response.notification.request.content.userInfo)
-                
-            }
-            
-            completionHandler();
+                completionHandler();
             
         }
     }

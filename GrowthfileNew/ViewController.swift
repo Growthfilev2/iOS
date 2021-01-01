@@ -199,7 +199,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
                                                 [AVVideoCodecKey: AVVideoCodecType.jpeg])
         photoSettings.isHighResolutionPhotoEnabled =  true
         photoSettings.flashMode = flashStatus
-        
+                
         photoOutput.capturePhoto(with: photoSettings, delegate: self)
         
         
@@ -338,72 +338,41 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         cameraControlButton.layer.masksToBounds = false
     }
     
+
+//    private func updatePreviewLayer(layer: AVCaptureConnection, orientation: AVCaptureVideoOrientation) {
+//        layer.videoOrientation = orientation
+//        videoPreviewLayer?.frame = self.view.bounds
+//    }
     
-    //    func updateVideoOrientation() {
-    //
-    //        guard self.videoPreviewLayer.connection?.isVideoOrientationSupported else {
-    //            print("isVideoOrientationSupported is false")
-    //            return
-    //        }
-    //
-    //        let statusBarOrientation = UIApplication.shared.statusBarOrientation
-    //        let videoOrientation: AVCaptureVideoOrientation = statusBarOrientation.videoOrientation ?? .portrait
-    //
-    //        if self.videoPreviewLayer.connection?.videoOrientation == videoOrientation {
-    //            print("no change to videoOrientation")
-    //            return
-    //        }
-    //
-    //        self.videoPreviewLayer.frame =
-    //        self.videoPreviewLayer.connection.videoOrientation = videoOrientation
-    //        self.videoPreviewLayer.removeAllAnimations()
-    //    }
-    //
-    //    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
-    //        super.viewWillTransition(to: size, with: coordinator)
-    //
-    //        coordinator.animate(alongsideTransition: nil, completion: { [weak self] (context) in
-    //            DispatchQueue.main.async(execute: {
-    //                self?.updateVideoOrientation()
-    //            })
-    //        })
-    //    }
-    
-    private func updatePreviewLayer(layer: AVCaptureConnection, orientation: AVCaptureVideoOrientation) {
-        layer.videoOrientation = orientation
-        videoPreviewLayer?.frame = self.view.bounds
-    }
-    
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        
-        if let connection =  self.videoPreviewLayer?.connection  {
-            let currentDevice: UIDevice = UIDevice.current
-            let orientation: UIDeviceOrientation = currentDevice.orientation
-            let previewLayerConnection : AVCaptureConnection = connection
-            
-            if previewLayerConnection.isVideoOrientationSupported {
-                switch (orientation) {
-                case .portrait:
-                    updatePreviewLayer(layer: previewLayerConnection, orientation: .portrait)
-                    break
-                case .landscapeRight:
-                    updatePreviewLayer(layer: previewLayerConnection, orientation: .landscapeLeft)
-                    break
-                case .landscapeLeft:
-                    updatePreviewLayer(layer: previewLayerConnection, orientation: .landscapeRight)
-                    break
-                case .portraitUpsideDown:
-                    updatePreviewLayer(layer: previewLayerConnection, orientation: .portraitUpsideDown)
-                    break
-                    
-                default:
-                    updatePreviewLayer(layer: previewLayerConnection, orientation: .portrait)
-                    break
-                }
-            }
-        }
-    }
+//    override func viewDidLayoutSubviews() {
+//        super.viewDidLayoutSubviews()
+//        
+//        if let connection =  self.videoPreviewLayer?.connection  {
+//            let currentDevice: UIDevice = UIDevice.current
+//            let orientation: UIDeviceOrientation = currentDevice.orientation
+//            let previewLayerConnection : AVCaptureConnection = connection
+//            if previewLayerConnection.isVideoOrientationSupported {
+//                switch (orientation) {
+//                case .portrait:
+//                    updatePreviewLayer(layer: previewLayerConnection, orientation: .portrait)
+//                    break
+//                case .landscapeRight:
+//                    updatePreviewLayer(layer: previewLayerConnection, orientation: .landscapeLeft)
+//                    break
+//                case .landscapeLeft:
+//                    updatePreviewLayer(layer: previewLayerConnection, orientation: .landscapeRight)
+//                    break
+//                case .portraitUpsideDown:
+//                    updatePreviewLayer(layer: previewLayerConnection, orientation: .portraitUpsideDown)
+//                    break
+//                    
+//                default:
+//                    updatePreviewLayer(layer: previewLayerConnection, orientation: .portrait)
+//                    break
+//                }
+//            }
+//        }
+//    }
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         if let pickedImage = info[.originalImage] as? UIImage {
@@ -511,10 +480,12 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         super.loadView()
         
         let preferences = WKPreferences()
-        preferences.javaScriptEnabled = true
+        WKWebpagePreferences().allowsContentJavaScript = true
+//        preferences.javaScriptEnabled = true
         
         let configuration = WKWebViewConfiguration()
         configuration.preferences = preferences
+        
         configuration.limitsNavigationsToAppBoundDomains = true;
         
         let userContentController = WKUserContentController()
@@ -614,7 +585,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
     
     @objc func retrieveUpdatedTokenFromNotificationDict(_ notification :NSNotification){
         if let dict = notification.userInfo as NSDictionary? {
-            let newToken:String = dict["updateToken"]! as! String
+            let newToken:String = dict["updatedToken"]! as! String
             setFcmTokenToJsStorage(token: newToken);
         }
     }
@@ -755,15 +726,24 @@ class ViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHan
         })
         
         
-        InstanceID.instanceID().instanceID(handler: { (result, error) in
-            if let error = error {
-                print("Error fetching remote instange ID: \(error)")
+        Messaging.messaging().token{token,error in
+            if let error = error  {
+                print("Error fetching FCM registration token: \(error)")
             }
-            else if let result = result {
-                print("Remote instance ID token: \(result.token)")
-                self.setFcmTokenToJsStorage(token:result.token)
+            else if let token = token {
+                self.setFcmTokenToJsStorage(token:token)
             }
-        })
+        }
+        
+//        InstanceID.instanceID().instanceID(handler: { (result, error) in
+//            if let error = error {
+//                print("Error fetching remote instange ID: \(error)")
+//            }
+//            else if let result = result {
+//                print("Remote instance ID token: \(result.token)")
+//                self.setFcmTokenToJsStorage(token:result.token)
+//            }
+//        })
         
         let appDelegate = UIApplication.shared.delegate as! AppDelegate;
         let deepLink = appDelegate.deepLink
@@ -1045,6 +1025,9 @@ extension ViewController: AVCaptureMetadataOutputObjectsDelegate {
     }
     
     func metadataOutput(_ output: AVCaptureMetadataOutput, didOutput metadataObjects: [AVMetadataObject], from connection: AVCaptureConnection) {
+        
+        connection.isVideoMirrored = isCameraFront
+    
         // Check if the metadataObjects array is not nil and it contains at least one object.
         if metadataObjects.count == 0 {
             print("No qr code detected")
@@ -1112,8 +1095,14 @@ extension ViewController: AVCapturePhotoCaptureDelegate {
         }
         
         guard let photoImage = UIImage(data:photoData) else {return}
+        
+        var flippedImage = photoImage
+        if isCameraFront {
+            flippedImage = UIImage(cgImage: photoImage.cgImage!, scale:photoImage.scale, orientation: .leftMirrored)
+        }
+        
         closeCamera()
-        webView.evaluateJavaScript("setFilePath('\(Helper.convertImageDataToBase64(image:photoImage))')", completionHandler: nil)
+        webView.evaluateJavaScript("setFilePath('\(Helper.convertImageDataToBase64(image:flippedImage))')", completionHandler: nil)
     }
     
 }
