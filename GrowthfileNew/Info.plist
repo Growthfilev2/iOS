@@ -2,8 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>NSUserTrackingUsageDescription</key>
-	<string>OnDuty uses Facebook SDK to log app events such as app installs, login ,signup and other events to analyze app usage.</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
@@ -74,19 +72,21 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>Allow Growthfile to access Camera for changing profile Picture</string>
+	<string>Allow OnDuty to access Camera for changing profile Picture</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>Growthfile requires location services to remind and recommend pending activities near their current location and check-in.  </string>
+	<string>OnDuty requires location services to remind and recommend pending activities near their current location and check-in.  </string>
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string>Growthfile requires location services to remind and recommend pending activities near their current location and check-in.  </string>
+	<string>OnDuty requires location services to remind and recommend pending activities near their current location and check-in.  </string>
 	<key>NSLocationUsageDescription</key>
-	<string>Growthfile requires location services to remind and recommend pending activities near their current location and check-in.  </string>
+	<string>OnDuty requires location services to remind and recommend pending activities near their current location and check-in.  </string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Growthfile requires location services to remind and recommend pending activities near their current location and check-in.  </string>
+	<string>OnDuty requires location services to remind and recommend pending activities near their current location and check-in.  </string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>Allow Growthfile to access Camera for changing profile Picture</string>
+	<string>Allow OnDuty to access Camera for changing profile Picture</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Allow Growthfile to access Photo Library for changing profile Picture</string>
+	<string>Allow OnDuty to access Photo Library for changing profile Picture</string>
+	<key>NSUserTrackingUsageDescription</key>
+	<string>OnDuty uses Facebook SDK to log app events such as app installs, login ,signup and other events to analyze app usage.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>remote-notification</string>
