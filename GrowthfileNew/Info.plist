@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>NSUserTrackingUsageDescription</key>
-	<string>We collect app events that are relayed to facbook to better manage user guestures</string>
+	<string>OnDuty uses Facebook SDK to log app events such as app installs, login ,signup and other events to analyze app usage.</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
